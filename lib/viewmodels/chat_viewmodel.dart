@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../models/chat_model.dart';
 import '../services/api_service.dart';
@@ -23,20 +23,50 @@ class ChatViewModel extends ChangeNotifier {
   bool get isPlaying => _isPlaying;
 
   void _initDefaultGreeting() {
-    _messages.add(
+    initGreetingForLocale('mr');
+  }
+
+  void initGreetingForLocale(String locale) {
+    if (_messages.isNotEmpty && _messages.first.id == 'greet_1') {
+      _messages.removeAt(0);
+    }
+    final isEn = locale == 'en';
+    final isHi = locale == 'hi';
+
+    _messages.insert(
+      0,
       ChatMessage(
         id: 'greet_1',
-        text: 'नमस्कार! मी किसानमित्र कृषी AI सहाय्यक आहे. आपण बाजारभाव, पीक रोग, फवारणीच्या वेळा किंवा खतांबद्दल मराठी, हिंदी अथवा इंग्रजीत विचारू शकता.',
+        text: isEn
+            ? 'Hello! I am KisanMitra AI farming assistant. You can ask me about mandi prices, crop diseases, spray timings, or fertilizers in your preferred language.'
+            : isHi
+                ? 'नमस्ते! मैं किसानमित्र कृषि AI सहायक हूँ। आप मंडी भाव, फसल रोग, छिड़काव समय और खाद के बारे में पूछ सकते हैं।'
+                : 'नमस्कार! मी किसानमित्र कृषी AI सहाय्यक आहे. आपण बाजारभाव, पीक रोग, फवारणीच्या वेळा किंवा खतांबद्दल मराठी, हिंदी अथवा इंग्रजीत विचारू शकता.',
         isUser: false,
         timestamp: DateTime.now(),
-        quickReplies: [
-          'आजचा सोयाबीन बाजारभाव',
-          'फवारणीसाठी हवामान अनुकूल आहे का?',
-          'सोयाबीनवरील तांबेरा औषध',
-          'मातीतील युरिया प्रमाण',
-        ],
+        quickReplies: isEn
+            ? [
+                "Today's Soybean Mandi Rate",
+                'Is weather safe for spraying now?',
+                'Soybean Rust treatment',
+                'Urea dosage per acre',
+              ]
+            : isHi
+                ? [
+                    'आज का सोयाबीन मंडी भाव',
+                    'क्या अभी छिड़काव के लिए मौसम सुरक्षित है?',
+                    'सोयाबीन रस्ट रोग का इलाज',
+                    'खेत में यूरिया की मात्रा',
+                  ]
+                : [
+                    'आजचा सोयाबीन बाजारभाव',
+                    'फवारणीसाठी हवामान अनुकूल आहे का?',
+                    'सोयाबीनवरील तांबेरा औषध',
+                    'मातीतील युरिया प्रमाण',
+                  ],
       ),
     );
+    notifyListeners();
   }
 
   Future<void> sendMessage(String text, String locale) async {

@@ -59,16 +59,16 @@ class DiseaseScannerView extends StatelessWidget {
 
             // 2. Loading State
             if (diseaseVm.isAnalyzing) ...[
-              const Center(
+              Center(
                 child: Padding(
-                  padding: EdgeInsets.all(32),
+                  padding: const EdgeInsets.all(32),
                   child: Column(
                     children: [
-                      CircularProgressIndicator(color: AppColors.primary),
-                      SizedBox(height: 12),
+                      const CircularProgressIndicator(color: AppColors.primary),
+                      const SizedBox(height: 12),
                       Text(
-                        'AI पान रोग निदान सुरू आहे...',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        authVm.isEn ? 'AI leaf disease diagnosis in progress...' : 'AI पान रोग निदान सुरू आहे...',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                     ],
                   ),
@@ -76,7 +76,7 @@ class DiseaseScannerView extends StatelessWidget {
               ),
             ] else if (diseaseVm.diagnosisResult != null) ...[
               // 3. AI Diagnosis Result Card
-              _buildDiagnosisResultCard(context, diseaseVm, weatherVm, loc),
+              _buildDiagnosisResultCard(context, diseaseVm, weatherVm, loc, authVm.isEn),
             ],
           ],
         ),
@@ -103,15 +103,15 @@ class DiseaseScannerView extends StatelessWidget {
             child: const Icon(Icons.add_a_photo_outlined, color: AppColors.primary, size: 40),
           ),
           const SizedBox(height: 14),
-          const Text(
-            'रोगाची लागण झालेल्या पानाचा स्पष्ट फोटो काढा',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+          Text(
+            loc == 'en' ? 'Take a clear photo of infected crop leaf' : 'रोगाची लागण झालेल्या पानाचा स्पष्ट फोटो काढा',
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
-          const Text(
-            'कॅमेरा थेट पानाच्या जवळ ठेवून सूर्यप्रकाशात फोटो घ्या.',
-            style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          Text(
+            loc == 'en' ? 'Hold camera close to leaf with adequate sunlight.' : 'कॅमेरा थेट पानाच्या जवळ ठेवून सूर्यप्रकाशात फोटो घ्या.',
+            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
@@ -187,6 +187,7 @@ class DiseaseScannerView extends StatelessWidget {
     DiseaseViewModel diseaseVm,
     WeatherViewModel weatherVm,
     String loc,
+    bool isEn,
   ) {
     final res = diseaseVm.diagnosisResult!;
     final isWeatherSafe = weatherVm.isSafeToSpray;
@@ -219,7 +220,7 @@ class DiseaseScannerView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      '${(res.confidence * 100).toStringAsFixed(0)}% AI अचूकता',
+                      '${(res.confidence * 100).toStringAsFixed(0)}% AI ${isEn ? "Accuracy" : "अचूकता"}',
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -255,8 +256,8 @@ class DiseaseScannerView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         isWeatherSafe
-                            ? 'हवामान अनुकूल: सध्या फवारणी करणे सुरक्षित आहे.'
-                            : 'हवामान धोका: पाऊस किंवा वेगाने वाहणाऱ्या वाऱ्यामुळे आत्ता फवारणी करू नका.',
+                            ? (isEn ? 'Safe to Spray: Weather conditions are optimal for chemical application.' : 'हवामान अनुकूल: सध्या फवारणी करणे सुरक्षित आहे.')
+                            : (isEn ? 'Weather Risk: Rain or high wind drift hazard. Do not spray now.' : 'हवामान धोका: पाऊस किंवा वेगाने वाहणाऱ्या वाऱ्यामुळे आत्ता फवारणी करू नका.'),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
@@ -295,16 +296,16 @@ class DiseaseScannerView extends StatelessWidget {
                   ),
                   if (rx.tradeNames != null)
                     Text(
-                      'बाजार नाव (Trade): ${rx.tradeNames}',
+                      '${isEn ? "Trade Name" : "बाजार नाव (Trade)"}: ${rx.tradeNames}',
                       style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                     ),
                   const Divider(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildRxBadge('प्रमाण', rx.dosagePerAcre),
-                      _buildRxBadge('पाणी', rx.waterVolumeLiters),
-                      _buildRxBadge('प्रतीक्षा काळ', '${rx.waitingPeriodDays} दिवस'),
+                      _buildRxBadge(isEn ? 'Dosage' : 'प्रमाण', rx.dosagePerAcre),
+                      _buildRxBadge(isEn ? 'Water' : 'पाणी', rx.waterVolumeLiters),
+                      _buildRxBadge(isEn ? 'Waiting Period' : 'प्रतीक्षा काळ', '${rx.waitingPeriodDays} ${isEn ? "days" : "दिवस"}'),
                     ],
                   ),
                 ],

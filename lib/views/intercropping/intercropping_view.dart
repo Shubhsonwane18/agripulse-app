@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
-import '../../models/intercropping_model.dart';
 import '../../viewmodels/intercropping_viewmodel.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 
@@ -13,19 +12,21 @@ class IntercroppingView extends StatelessWidget {
     final intercropVm = context.watch<IntercroppingViewModel>();
     final authVm = context.watch<AuthViewModel>();
 
+    final isEn = authVm.isEn;
+
     final crops = [
-      {'id': 'all', 'label': 'सर्व आंतरपिके (All)'},
-      {'id': 'सोयाबीन', 'label': '🌱 सोयाबीन'},
-      {'id': 'कापूस', 'label': '☁️ कापूस'},
-      {'id': 'ऊस', 'label': '🎋 ऊस'},
-      {'id': 'मका', 'label': '🌽 मका'},
+      {'id': 'all', 'label': isEn ? 'All Intercrops' : 'सर्व आंतरपिके (All)'},
+      {'id': 'सोयाबीन', 'label': isEn ? '🌱 Soybean' : '🌱 सोयाबीन'},
+      {'id': 'कापूस', 'label': isEn ? '☁️ Cotton' : '☁️ कापूस'},
+      {'id': 'ऊस', 'label': isEn ? '🎋 Sugarcane' : '🎋 ऊस'},
+      {'id': 'मका', 'label': isEn ? '🌽 Maize' : '🌽 मका'},
     ];
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
-          authVm.isMr ? 'आंतरपीक व फेरपालट मार्गदर्शक' : 'Intercropping & Crop Rotation',
+          isEn ? 'Intercropping & Crop Rotation Planner' : 'आंतरपीक व फेरपालट मार्गदर्शक',
           style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
         ),
       ),
@@ -49,28 +50,30 @@ class IntercroppingView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.workspace_premium, color: Colors.amber, size: 20),
-                      SizedBox(width: 6),
+                      const Icon(Icons.workspace_premium, color: Colors.amber, size: 20),
+                      const SizedBox(width: 6),
                       Text(
-                        'दुहेरी नफा व खत बचत हमी',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        isEn ? 'Guaranteed Profit & Fertilizer Savings' : 'दुहेरी नफा व खत बचत हमी',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'आंतरपिकामुळे जमिनीतील नत्र वाढते, खताचा खर्च ३०% वाचतो आणि एकरी ₹१८,००० ते ₹४०,००० अतिरिक्त नफा मिळतो.',
-                    style: TextStyle(color: Colors.white, fontSize: 11),
+                  Text(
+                    isEn
+                        ? 'Intercropping enriches soil nitrogen, saves 30% fertilizer expense, and yields ₹18,000 to ₹40,000 extra profit per acre.'
+                        : 'आंतरपिकामुळे जमिनीतील नत्र वाढते, खताचा खर्च ३०% वाचतो आणि एकरी ₹१८,००० ते ₹४०,००० अतिरिक्त नफा मिळतो.',
+                    style: const TextStyle(color: Colors.white, fontSize: 11),
                   ),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'तुमचे शेतक्षेत्र निवडा:',
-                        style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                      Text(
+                        isEn ? 'Select Farm Acreage:' : 'तुमचे शेतक्षेत्र निवडा:',
+                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                       Row(
                         children: [1.0, 2.0, 3.0, 5.0].map((ac) {
@@ -86,7 +89,7 @@ class IntercroppingView extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  '${ac.toStringAsFixed(0)} एकर',
+                                  '${ac.toStringAsFixed(0)} ${isEn ? "Acres" : "एकर"}',
                                   style: TextStyle(
                                     color: isSel ? AppColors.primary : Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -170,7 +173,7 @@ class IntercroppingView extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            plan.nameMr,
+                            isEn ? plan.name : plan.nameMr,
                             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
                           ),
                         ),
@@ -181,9 +184,9 @@ class IntercroppingView extends StatelessWidget {
                               color: AppColors.primary,
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Text(
-                              '⭐ शिफारस',
-                              style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                            child: Text(
+                              isEn ? '⭐ Recommended' : '⭐ शिफारस',
+                              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
                             ),
                           ),
                       ],
@@ -202,9 +205,9 @@ class IntercroppingView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'ओळींचे प्रत्यक्ष प्रमाण (Field Row Pattern):',
-                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primary),
+                          Text(
+                            isEn ? 'Field Row Pattern:' : 'ओळींचे प्रत्यक्ष प्रमाण (Field Row Pattern):',
+                            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primary),
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -236,11 +239,11 @@ class IntercroppingView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${intercropVm.farmAcreage.toStringAsFixed(0)} एकरासाठी संभाव्य अतिरिक्त नफा:',
+                                isEn ? 'Potential Extra Profit for ${intercropVm.farmAcreage.toStringAsFixed(0)} Acres:' : '${intercropVm.farmAcreage.toStringAsFixed(0)} एकरासाठी संभाव्य अतिरिक्त नफा:',
                                 style: const TextStyle(fontSize: 10, color: Colors.green),
                               ),
                               Text(
-                                '+₹${extraTotal.toStringAsFixed(0)} अतिरिक्त उत्पन्न',
+                                '+₹${extraTotal.toStringAsFixed(0)} ${isEn ? "Extra Income" : "अतिरिक्त उत्पन्न"}',
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w900,
@@ -256,7 +259,7 @@ class IntercroppingView extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     // Scientific rationale
-                    const Text('शास्त्रोक्त फायदे (Scientific Benefits):', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                    Text(isEn ? 'Scientific Soil & Agronomic Benefits:' : 'शास्त्रोक्त फायदे (Scientific Benefits):', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
                     Text(
                       plan.scientificRationale,

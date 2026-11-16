@@ -7,7 +7,7 @@ class MandiViewModel extends ChangeNotifier {
 
   double _weightQuintals = 25.0;
   String _selectedVehicle = 'tata_ace';
-  double _dieselPrice = 92.0;
+  final double _dieselPrice = 92.0;
   String _selectedCommodity = 'Soybean';
 
   bool _isLoading = false;

@@ -61,11 +61,11 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(color: AppColors.primary),
               accountName: Text(
-                authVm.currentUser?.fullName ?? 'शेतकरी (Farmer)',
+                authVm.currentUser?.fullName.isNotEmpty == true ? authVm.currentUser!.fullName : (authVm.isEn ? 'Farmer' : 'शेतकरी (Farmer)'),
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               accountEmail: Text(
-                '${authVm.currentUser?.village ?? "शिरोळ"}, ${authVm.currentUser?.district ?? "कोल्हापूर"} • ${authVm.currentUser?.landSizeAcres ?? 4.5} एकर',
+                '${authVm.currentUser?.village ?? (authVm.isEn ? "Shirol" : "शिरोळ")}, ${authVm.currentUser?.district ?? (authVm.isEn ? "Kolhapur" : "कोल्हापूर")} • ${authVm.currentUser?.landSizeAcres ?? 4.5} ${authVm.isEn ? "Acres" : "एकर"}',
                 style: const TextStyle(fontSize: 12),
               ),
               currentAccountPicture: CircleAvatar(
@@ -73,7 +73,7 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
                 child: Text(
                   authVm.currentUser?.fullName.isNotEmpty == true
                       ? authVm.currentUser!.fullName[0]
-                      : 'क',
+                      : (authVm.isEn ? 'F' : 'क'),
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -130,7 +130,7 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.account_balance, color: Colors.purple),
-              title: const Text('शासकीय योजना व थेट अनुदान (DBT)'),
+              title: Text(authVm.isEn ? 'Government Schemes & Subsidies (DBT)' : 'शासकीय योजना व थेट अनुदान (DBT)'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const SchemesView()));
@@ -138,7 +138,7 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
             ),
             ListTile(
               leading: const Icon(Icons.account_balance_wallet, color: Color(0xFF165B33)),
-              title: const Text('शेतकरी नफा-तोटा वही (Farm Khata)'),
+              title: Text(authVm.isEn ? 'Farm Khata & Expense Ledger' : 'शेतकरी नफा-तोटा वही (Farm Khata)'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmKhataView()));
@@ -146,7 +146,7 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
             ),
             ListTile(
               leading: const Icon(Icons.grass, color: Colors.amber),
-              title: const Text('आंतरपीक व फेरपालट मार्गदर्शक'),
+              title: Text(authVm.isEn ? 'Intercropping & Rotation Planner' : 'आंतरपीक व फेरपालट मार्गदर्शक'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const IntercroppingView()));

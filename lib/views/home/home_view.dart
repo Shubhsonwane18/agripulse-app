@@ -4,17 +4,17 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../constants/supported_languages.dart';
 import '../../models/mandi_model.dart';
-import '../../models/soil_model.dart';
-import '../../models/crop_tracker_model.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../../viewmodels/weather_viewmodel.dart';
 import '../../viewmodels/mandi_viewmodel.dart';
 import '../../viewmodels/soil_viewmodel.dart';
+import '../markets/mandi_profit_calculator_view.dart';
 import '../soil/soil_advisory_view.dart';
 import '../store/store_view.dart';
 import '../schemes/schemes_view.dart';
 import '../khata/farm_khata_view.dart';
 import '../intercropping/intercropping_view.dart';
+import '../profile/profile_view.dart';
 import '../language/language_selection_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -25,7 +25,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  final TextEditingController _customWeightController = TextEditingController();
   final TextEditingController _customStockController = TextEditingController();
 
   final List<String> _commodities = [
@@ -46,163 +45,22 @@ class _HomeViewState extends State<HomeView> {
     'Wheat': '🌾 गहू',
   };
 
+  final Map<String, String> _commodityLabelsEn = {
+    'Soybean': '🌱 Soybean',
+    'Cotton': '☁️ Cotton',
+    'Onion': '🧅 Onion',
+    'Tomato': '🍅 Tomato',
+    'Tur': '🌾 Tur / Arhar',
+    'Wheat': '🌾 Wheat',
+  };
+
   @override
   void dispose() {
-    _customWeightController.dispose();
     _customStockController.dispose();
     super.dispose();
   }
 
-  void _showMandiDetailSheet(BuildContext context, MandiEvaluation eval, MandiViewModel mandiVm) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        eval.mandiName,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
-                      ),
-                      Text(
-                        '${eval.distanceKm} km अंतर • ${eval.district ?? "APMC Yard"}',
-                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '₹${eval.quotedGrossRate.toStringAsFixed(0)} / Qtl',
-                    style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.primary, fontSize: 14),
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 24),
-            const Text(
-              'खर्च व नफा तपशील (Expense & Realization Breakdown)',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
-            ),
-            const SizedBox(height: 10),
-            _buildSheetRow('एकूण माल (Produce Weight)', '${mandiVm.weightQuintals.toStringAsFixed(0)} क्विंटल'),
-            _buildSheetRow('बाजार भाव एकूण रक्कम (Gross Revenue)', '₹${eval.grossRevenue.toStringAsFixed(0)}'),
-            _buildSheetRow('⛽ डिझेल खर्च (Roundtrip Fuel)', '-₹${eval.fuelCost.toStringAsFixed(0)}', isDeduction: true),
-            _buildSheetRow('👷 हमाली व तोलाई (Loading Fee)', '-₹${eval.handlingFee.toStringAsFixed(0)}', isDeduction: true),
-            _buildSheetRow('🏛️ कृषी उत्पन्न बाजार सेस (APMC Cess 1.05%)', '-₹${eval.cessFee.toStringAsFixed(0)}', isDeduction: true),
-            _buildSheetRow('एकूण वाहतूक व बाजार खर्च', '-₹${eval.logisticsOverhead.toStringAsFixed(0)}', isDeduction: true),
-            const Divider(height: 20),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.primaryLight.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'हातात पडणारा निव्वळ नफा',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
-                      ),
-                      Text(
-                        'True In-Hand Net Cash',
-                        style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '₹${eval.netEarnings.toStringAsFixed(0)}',
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.primary),
-                      ),
-                      Text(
-                        '₹${eval.effectiveNetRate.toStringAsFixed(0)} / क्विंटल निव्वळ',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => Navigator.pop(ctx),
-                icon: const Icon(Icons.check, size: 18),
-                label: const Text('समजले (Close)'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSheetRow(String label, String value, {bool isDeduction = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: isDeduction ? Colors.red.shade700 : AppColors.textPrimary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showEditCropTrackerDialog(BuildContext context, SoilViewModel soilVm) {
+  void _showEditCropTrackerDialog(BuildContext context, SoilViewModel soilVm, bool isEn) {
     String currentCrop = soilVm.cropTracker.growingCrop;
     double currentStock = soilVm.cropTracker.storedStockQuintals;
     _customStockController.text = currentStock.toStringAsFixed(0);
@@ -212,13 +70,13 @@ class _HomeViewState extends State<HomeView> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.edit_note_rounded, color: AppColors.primary),
-              SizedBox(width: 8),
+              const Icon(Icons.edit_note_rounded, color: AppColors.primary),
+              const SizedBox(width: 8),
               Text(
-                'पिके व साठा नोंदवा',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                isEn ? 'Update Standing Crop & Stock' : 'पिके व साठा नोंदवा',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -226,7 +84,10 @@ class _HomeViewState extends State<HomeView> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('सध्या शेतात उभे असलेले पीक:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              Text(
+                isEn ? 'Currently Growing Crop in Field:' : 'सध्या शेतात उभे असलेले पीक:',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 6),
               DropdownButtonFormField<String>(
                 value: _commodities.contains(currentCrop)
@@ -245,9 +106,10 @@ class _HomeViewState extends State<HomeView> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 ),
                 items: _commodities.map((c) {
+                  final label = isEn ? (_commodityLabelsEn[c] ?? c) : (_commodityLabelsMr[c] ?? c);
                   return DropdownMenuItem(
                     value: c,
-                    child: Text(_commodityLabelsMr[c] ?? c),
+                    child: Text(label),
                   );
                 }).toList(),
                 onChanged: (val) {
@@ -259,13 +121,16 @@ class _HomeViewState extends State<HomeView> {
                 },
               ),
               const SizedBox(height: 14),
-              const Text('घरी / गोदामात शिल्लक साठा (क्विंटल):', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              Text(
+                isEn ? 'Stored Farm Stock (Quintals):' : 'घरी / गोदामात शिल्लक साठा (क्विंटल):',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 6),
               TextField(
                 controller: _customStockController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  suffixText: 'क्विंटल',
+                  suffixText: isEn ? 'Qtl' : 'क्विंटल',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 ),
@@ -275,25 +140,25 @@ class _HomeViewState extends State<HomeView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('रद्द करा'),
+              child: Text(isEn ? 'Cancel' : 'रद्द करा'),
             ),
             ElevatedButton(
               onPressed: () {
                 final qty = double.tryParse(_customStockController.text.trim()) ?? 35.0;
                 soilVm.updateCropTracker(
-                  growingCrop: _commodityLabelsMr[currentCrop] ?? currentCrop,
+                  growingCrop: isEn ? (_commodityLabelsEn[currentCrop] ?? currentCrop) : (_commodityLabelsMr[currentCrop] ?? currentCrop),
                   storedStockQuintals: qty,
                 );
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('✓ पिकांची माहिती व AI अंदाज अपडेट केला!'),
+                  SnackBar(
+                    content: Text(isEn ? '✓ Crop details & AI forecast updated!' : '✓ पिकांची माहिती व AI अंदाज अपडेट केला!'),
                     backgroundColor: AppColors.primary,
                   ),
                 );
               },
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-              child: const Text('सेव्ह करा'),
+              child: Text(isEn ? 'Save' : 'सेव्ह करा'),
             ),
           ],
         ),
@@ -308,13 +173,20 @@ class _HomeViewState extends State<HomeView> {
     final mandiVm = context.watch<MandiViewModel>();
     final soilVm = context.watch<SoilViewModel>();
     final loc = authVm.locale;
+    final isEn = authVm.isEn;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        leading: Builder(
+          builder: (ctx) => IconButton(
+            icon: const Icon(Icons.menu_rounded, color: Colors.white),
+            tooltip: isEn ? 'Menu' : 'मेनू',
+            onPressed: () => Scaffold.of(ctx).openDrawer(),
+          ),
+        ),
         title: Row(
           children: [
             const Text(
@@ -371,7 +243,7 @@ class _HomeViewState extends State<HomeView> {
           ),
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white, size: 19),
-            tooltip: 'Sign Out (लॉगआउट)',
+            tooltip: isEn ? 'Sign Out' : 'Sign Out (लॉगआउट)',
             onPressed: () async {
               await authVm.signOut();
             },
@@ -390,19 +262,19 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Farmer Identity & GPS Location Header
-              _buildFarmerHeaderCard(context, authVm),
+              _buildFarmerHeaderCard(context, authVm, isEn),
               const SizedBox(height: 14),
 
-              // 2. CORE FEATURE 1: Nearby Mandis, Crop Selector & Quantity-First Net Profit Ranker
-              _buildMandiCalculatorSection(context, mandiVm, loc),
+              // 2. CORE FEATURE 1: Nearby Mandis & Dedicated Calculator Launcher
+              _buildMandiCalculatorSection(context, mandiVm, isEn),
               const SizedBox(height: 14),
 
               // 3. CORE FEATURE 2: GPS Location Soil Type & Recommended Suitable Crops
-              _buildSoilDetectionSection(context, soilVm, authVm),
+              _buildSoilDetectionSection(context, soilVm, authVm, isEn),
               const SizedBox(height: 14),
 
               // 4. CORE FEATURE 3: My Crops & AI Future Price Predictor (Hold vs Sell)
-              _buildMyCropsForecastSection(context, soilVm),
+              _buildMyCropsForecastSection(context, soilVm, isEn),
               const SizedBox(height: 14),
 
               // 5. Hyperlocal Weather Spray Window Banner
@@ -411,7 +283,7 @@ class _HomeViewState extends State<HomeView> {
 
               // 6. Quick Agronomic Tools Navigation Grid
               Text(
-                authVm.isMr ? 'शेती निर्णय साधने' : (authVm.isHi ? 'कृषि निर्णय उपकरण' : 'Agronomic Tools'),
+                isEn ? 'Agricultural Decision Tools' : (authVm.isHi ? 'कृषि निर्णय उपकरण' : 'शेती निर्णय साधने'),
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
@@ -419,7 +291,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
               const SizedBox(height: 8),
-              _buildQuickActionsGrid(context, authVm),
+              _buildQuickActionsGrid(context, authVm, isEn),
               const SizedBox(height: 20),
             ],
           ),
@@ -429,72 +301,98 @@ class _HomeViewState extends State<HomeView> {
   }
 
   // --- 1. FARMER HEADER CARD ---
-  Widget _buildFarmerHeaderCard(BuildContext context, AuthViewModel authVm) {
+  Widget _buildFarmerHeaderCard(BuildContext context, AuthViewModel authVm, bool isEn) {
     final user = authVm.currentUser;
-    final name = user?.fullName ?? 'रमेश पाटील (शेतकरी)';
-    final location = '${user?.village ?? "शिरोळ"}, ${user?.district ?? "कोल्हापूर"}';
+    final name = (user?.fullName != null && user!.fullName.isNotEmpty)
+        ? user.fullName
+        : (isEn ? 'Ramesh Patil (Farmer)' : 'रमेश पाटील (शेतकरी)');
+    final village = (user?.village != null && user!.village!.isNotEmpty)
+        ? user.village!
+        : (isEn ? 'Shirol' : 'शिरोळ');
+    final district = (user?.district != null && user!.district!.isNotEmpty)
+        ? user.district!
+        : (isEn ? 'Kolhapur' : 'कोल्हापूर');
     final acreage = user?.landSizeAcres ?? 4.5;
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.cardBorder),
-        boxShadow: const [
-          BoxShadow(color: Color(0x06000000), blurRadius: 8, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: AppColors.primaryLight,
-            child: const Icon(Icons.person, color: AppColors.primary, size: 26),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade50,
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.green.shade200),
-                      ),
-                      child: const Text(
-                        '✓ सक्रिय शेतकरी',
-                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.green),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '📍 $location • $acreage एकर शेतजमीन',
-                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                ),
-              ],
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ProfileView()),
+        );
+      },
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.cardBorder),
+          boxShadow: const [
+            BoxShadow(color: Color(0x06000000), blurRadius: 8, offset: Offset(0, 2)),
+          ],
+        ),
+        child: Row(
+          children: [
+            const CircleAvatar(
+              radius: 22,
+              backgroundColor: AppColors.primaryLight,
+              child: Icon(Icons.person, color: AppColors.primary, size: 26),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.green.shade200),
+                        ),
+                        child: Text(
+                          isEn ? '✓ Active Farmer' : '✓ सक्रिय शेतकरी',
+                          style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.green),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '📍 $village, $district • $acreage ${isEn ? "Acres Farmland" : "एकर शेतजमीन"}',
+                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 4),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.cardBorder),
+              ),
+              child: const Icon(Icons.edit_outlined, size: 16, color: AppColors.primary),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -503,13 +401,11 @@ class _HomeViewState extends State<HomeView> {
   Widget _buildMandiCalculatorSection(
     BuildContext context,
     MandiViewModel mandiVm,
-    String loc,
+    bool isEn,
   ) {
     final highestMandi = mandiVm.rankings.isNotEmpty
         ? (List<MandiEvaluation>.from(mandiVm.rankings)..sort((a, b) => b.quotedGrossRate.compareTo(a.quotedGrossRate))).first
         : null;
-
-    final bestNetMandi = mandiVm.bestMandi;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -528,13 +424,13 @@ class _HomeViewState extends State<HomeView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.storefront_rounded, color: AppColors.primary, size: 20),
-                  SizedBox(width: 6),
+                  const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 20),
+                  const SizedBox(width: 6),
                   Text(
-                    'नजीकच्या बाजारपेठा व नफा तुलना',
-                    style: TextStyle(
+                    isEn ? 'Nearby Mandis & Live Market Rates' : 'नजीकच्या बाजारपेठा व नफा तुलना',
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
                       color: AppColors.textPrimary,
@@ -556,28 +452,26 @@ class _HomeViewState extends State<HomeView> {
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
-            '१. पीक निवडा ➔ २. वजन टाका ➔ सर्व बाजारपेठांचा हातात पडणारा खरा नफा पाहा',
-            style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          Text(
+            isEn
+                ? 'Select crop ➔ View live rates ➔ Calculate transport & true net profit'
+                : '१. पीक निवडा ➔ २. थेट दर पाहा ➔ वाहतूक खर्च व निव्वळ नफा कॅल्क्युलेट करा',
+            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 12),
 
-          // Step 1: Crop Selection Chips
-          const Text(
-            'पायरी १: पीक निवडा (Select Crop)',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-          ),
-          const SizedBox(height: 6),
+          // Crop Selection Chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: _commodities.map((comm) {
                 final isSelected = mandiVm.selectedCommodity == comm;
+                final label = isEn ? (_commodityLabelsEn[comm] ?? comm) : (_commodityLabelsMr[comm] ?? comm);
                 return Padding(
                   padding: const EdgeInsets.only(right: 6),
                   child: ChoiceChip(
                     label: Text(
-                      _commodityLabelsMr[comm] ?? comm,
+                      label,
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -605,7 +499,7 @@ class _HomeViewState extends State<HomeView> {
           ),
           const SizedBox(height: 10),
 
-          // Highlight Highest Quoted Rate Mandi
+          // Highlight Highest Quoted Rate Mandi Banner
           if (highestMandi != null) ...[
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -623,7 +517,7 @@ class _HomeViewState extends State<HomeView> {
                       text: TextSpan(
                         style: const TextStyle(fontSize: 11, color: Colors.brown),
                         children: [
-                          const TextSpan(text: 'या पिकासाठी सर्वोच्च भाव: '),
+                          TextSpan(text: isEn ? 'Highest Price for this crop: ' : 'या पिकासाठी सर्वोच्च भाव: '),
                           TextSpan(
                             text: '${highestMandi.mandiName} ',
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -643,165 +537,158 @@ class _HomeViewState extends State<HomeView> {
             const SizedBox(height: 12),
           ],
 
-          // Step 2: Quantity First (वजन प्रथम टाका)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'पायरी २: शेतमालाचे वजन (Quantity)',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-              ),
-              Text(
-                'सध्या: ${mandiVm.weightQuintals.toStringAsFixed(0)} क्विंटल',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.primary),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [10, 25, 50, 100].map((q) {
-              final isSel = mandiVm.weightQuintals == q.toDouble();
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: InkWell(
-                    onTap: () => mandiVm.setWeight(q.toDouble()),
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSel ? AppColors.primary : AppColors.background,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: isSel ? AppColors.primary : AppColors.cardBorder),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$q Qtl',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: isSel ? Colors.white : AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
+          // Dedicated Page Launcher Button with Auto-Vehicle Info
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MandiProfitCalculatorView(
+                    initialCommodity: mandiVm.selectedCommodity,
                   ),
                 ),
               );
-            }).toList(),
-          ),
-          const SizedBox(height: 10),
-
-          // Step 3: Transport Vehicle Selector
-          const Text(
-            'पायरी ३: वाहतूक वाहन (Transport Vehicle)',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-          ),
-          const SizedBox(height: 6),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: VehicleOption.options.map((v) {
-                final isSelected = mandiVm.selectedVehicle == v.id;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: InkWell(
-                    onTap: () => mandiVm.setVehicle(v.id),
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primaryLight : Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: isSelected ? AppColors.primary : AppColors.cardBorder),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            v.id == 'tractor' ? Icons.agriculture : Icons.local_shipping_outlined,
-                            size: 14,
-                            color: isSelected ? AppColors.primary : AppColors.textSecondary,
+            },
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary, Color(0xFF1E4620)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.calculate_rounded, color: Colors.white, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isEn
+                              ? 'Calculate Transport & True Profit'
+                              : 'वाहतूक खर्च व निव्वळ नफा कॅल्क्युलेटर',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            v.localizedName,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? AppColors.primary : AppColors.textPrimary,
-                            ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          isEn
+                              ? 'Enter quantity ➔ Auto-select vehicle ➔ Compare in-hand cash'
+                              : 'वजन टाका ➔ वाहन आपोआप निवडले जाईल ➔ खरा नफा पाहा',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontSize: 10,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              }).toList(),
+                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 16),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
 
-          // Ranked Mandis List
+          // Top Mandis Preview List
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'सर्व बाजारपेठा (खर्च वजा जाता खरा नफा):',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+              Text(
+                isEn ? 'Top Mandis Overview:' : 'प्रमुख बाजारपेठा (थेट दर):',
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
               ),
-              if (mandiVm.isLoading)
-                const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MandiProfitCalculatorView(
+                        initialCommodity: mandiVm.selectedCommodity,
+                      ),
+                    ),
+                  );
+                },
+                child: Text(
+                  isEn ? 'Open Full Calculator ➔' : 'संपूर्ण कॅल्क्युलेटर उघडा ➔',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary),
                 ),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
-          ...mandiVm.rankings.asMap().entries.map((entry) {
+          ...mandiVm.rankings.take(3).toList().asMap().entries.map((entry) {
             final idx = entry.key;
             final eval = entry.value;
             final isWinner = idx == 0;
 
             return InkWell(
-              onTap: () => _showMandiDetailSheet(context, eval, mandiVm),
-              borderRadius: BorderRadius.circular(12),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MandiProfitCalculatorView(
+                      initialCommodity: mandiVm.selectedCommodity,
+                    ),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(10),
               child: Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isWinner ? AppColors.successBg.withValues(alpha: 0.6) : Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  color: isWinner ? AppColors.successBg.withValues(alpha: 0.5) : AppColors.background,
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: isWinner ? AppColors.primary : AppColors.cardBorder,
-                    width: isWinner ? 1.5 : 1.0,
                   ),
                 ),
                 child: Row(
                   children: [
-                    // Rank badge
                     Container(
-                      width: 28,
-                      height: 28,
+                      width: 24,
+                      height: 24,
                       decoration: BoxDecoration(
-                        color: isWinner ? AppColors.primary : AppColors.background,
+                        color: isWinner ? AppColors.primary : Colors.grey.shade300,
                         shape: BoxShape.circle,
                       ),
                       child: Center(
                         child: Text(
                           '#${idx + 1}',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: isWinner ? Colors.white : AppColors.textSecondary,
+                            color: isWinner ? Colors.white : Colors.black87,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
-
-                    // Mandi Info
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -811,7 +698,7 @@ class _HomeViewState extends State<HomeView> {
                               Flexible(
                                 child: Text(
                                   eval.mandiName,
-                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -824,42 +711,35 @@ class _HomeViewState extends State<HomeView> {
                                     color: AppColors.primary,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: const Text(
-                                    '🏆 सर्वाधिक नफा',
-                                    style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                                  child: Text(
+                                    isEn ? '🏆 Top Profit' : '🏆 सर्वाधिक नफा',
+                                    style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
                             ],
                           ),
-                          const SizedBox(height: 2),
                           Text(
-                            '${eval.distanceKm} km • बाजार भाव: ₹${eval.quotedGrossRate.toStringAsFixed(0)} • खर्च: -₹${eval.logisticsOverhead.toStringAsFixed(0)}',
-                            style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+                            '${eval.distanceKm} km • ${isEn ? "Quoted Rate:" : "बाजार भाव:"} ₹${eval.quotedGrossRate.toStringAsFixed(0)}/Qtl',
+                            style: const TextStyle(fontSize: 9, color: AppColors.textMuted),
                           ),
                         ],
                       ),
                     ),
-
-                    // Net In Hand Cash
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '₹${eval.netEarnings.toStringAsFixed(0)}',
+                          '₹${eval.quotedGrossRate.toStringAsFixed(0)}',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 13,
                             fontWeight: FontWeight.w900,
                             color: isWinner ? AppColors.primary : AppColors.textPrimary,
                           ),
                         ),
                         Text(
-                          'हातात पडणारा नफा',
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            color: isWinner ? AppColors.primary : AppColors.textMuted,
-                          ),
+                          isEn ? 'per Quintal' : 'प्रति क्विंटल',
+                          style: const TextStyle(fontSize: 8, color: AppColors.textMuted),
                         ),
                       ],
                     ),
@@ -878,6 +758,7 @@ class _HomeViewState extends State<HomeView> {
     BuildContext context,
     SoilViewModel soilVm,
     AuthViewModel authVm,
+    bool isEn,
   ) {
     final soil = soilVm.detectedSoil;
 
@@ -897,13 +778,13 @@ class _HomeViewState extends State<HomeView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.landscape_rounded, color: Colors.brown, size: 20),
-                  SizedBox(width: 6),
+                  const Icon(Icons.landscape_rounded, color: Colors.brown, size: 20),
+                  const SizedBox(width: 6),
                   Text(
-                    'स्थानिक माती प्रकार व योग्य पिके',
-                    style: TextStyle(
+                    isEn ? 'Local Soil Type & Suitable Crops' : 'स्थानिक माती प्रकार व योग्य पिके',
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
                       color: AppColors.textPrimary,
@@ -927,7 +808,7 @@ class _HomeViewState extends State<HomeView> {
           ),
           const SizedBox(height: 4),
           Text(
-            'स्थान: ${soil.locationTag}',
+            '${isEn ? "Location:" : "स्थान:"} ${soil.getLocation(isEn)}',
             style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 10),
@@ -949,7 +830,7 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     Expanded(
                       child: Text(
-                        soil.soilTypeName,
+                        soil.getSoilName(isEn),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w900,
@@ -975,7 +856,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'सेंद्रिय कर्ब: ${soil.organicCarbon} • ओलावा धारणा: ${soil.waterRetention}',
+                  '${isEn ? "Organic Carbon:" : "सेंद्रिय कर्ब:"} ${soil.getOrganicCarbon(isEn)} • ${isEn ? "Moisture Retention:" : "ओलावा धारणा:"} ${soil.getWaterRetention(isEn)}',
                   style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 10),
                 ),
               ],
@@ -984,9 +865,9 @@ class _HomeViewState extends State<HomeView> {
           const SizedBox(height: 12),
 
           // Recommended Suitable Crops
-          const Text(
-            'या जमिनीसाठी सर्वाधिक अनुकूल पिके (Suitable Crops):',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+          Text(
+            isEn ? 'Recommended Suitable Crops for this Soil:' : 'या जमिनीसाठी सर्वाधिक अनुकूल पिके (Suitable Crops):',
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
           ),
           const SizedBox(height: 8),
 
@@ -1012,7 +893,7 @@ class _HomeViewState extends State<HomeView> {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              crop.cropName.split(' ').first,
+                              crop.getName(isEn).split(' ').first,
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -1022,12 +903,12 @@ class _HomeViewState extends State<HomeView> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        crop.yieldPotential,
+                        crop.getYield(isEn),
                         style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.primary),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        crop.reason,
+                        crop.getReason(isEn),
                         style: const TextStyle(fontSize: 9, color: AppColors.textMuted),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -1053,7 +934,7 @@ class _HomeViewState extends State<HomeView> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    soil.managementTip,
+                    soil.getTip(isEn),
                     style: const TextStyle(fontSize: 10, color: AppColors.textPrimary),
                   ),
                 ),
@@ -1066,7 +947,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   // --- 4. MY CROPS & FUTURE PRICE PREDICTOR SECTION (HOLD VS SELL) ---
-  Widget _buildMyCropsForecastSection(BuildContext context, SoilViewModel soilVm) {
+  Widget _buildMyCropsForecastSection(BuildContext context, SoilViewModel soilVm, bool isEn) {
     final tracker = soilVm.cropTracker;
     final forecast = soilVm.priceForecast;
 
@@ -1086,13 +967,13 @@ class _HomeViewState extends State<HomeView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.auto_graph_rounded, color: Colors.deepPurple, size: 20),
-                  SizedBox(width: 6),
+                  const Icon(Icons.auto_graph_rounded, color: Colors.deepPurple, size: 20),
+                  const SizedBox(width: 6),
                   Text(
-                    'माझी पिके व AI बाजारभाव अंदाज',
-                    style: TextStyle(
+                    isEn ? 'My Standing Crops & AI Price Forecast' : 'माझी पिके व AI बाजारभाव अंदाज',
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
                       color: AppColors.textPrimary,
@@ -1101,7 +982,7 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
               InkWell(
-                onTap: () => _showEditCropTrackerDialog(context, soilVm),
+                onTap: () => _showEditCropTrackerDialog(context, soilVm, isEn),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
@@ -1109,13 +990,13 @@ class _HomeViewState extends State<HomeView> {
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(color: Colors.deepPurple.shade200),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.edit, size: 10, color: Colors.deepPurple),
-                      SizedBox(width: 2),
+                      const Icon(Icons.edit, size: 10, color: Colors.deepPurple),
+                      const SizedBox(width: 2),
                       Text(
-                        'बदला',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                        isEn ? 'Edit' : 'बदला',
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.deepPurple),
                       ),
                     ],
                   ),
@@ -1138,9 +1019,12 @@ class _HomeViewState extends State<HomeView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('सध्याचे पीक:', style: TextStyle(fontSize: 9, color: AppColors.textMuted)),
                       Text(
-                        tracker.growingCrop,
+                        isEn ? 'Standing Crop:' : 'सध्याचे पीक:',
+                        style: const TextStyle(fontSize: 9, color: AppColors.textMuted),
+                      ),
+                      Text(
+                        tracker.getGrowingCrop(isEn),
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1160,9 +1044,12 @@ class _HomeViewState extends State<HomeView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('शिल्लक साठा (Stock):', style: TextStyle(fontSize: 9, color: AppColors.textMuted)),
                       Text(
-                        '${tracker.storedStockQuintals.toStringAsFixed(0)} क्विंटल',
+                        isEn ? 'Stored Stock:' : 'शिल्लक साठा (Stock):',
+                        style: const TextStyle(fontSize: 9, color: AppColors.textMuted),
+                      ),
+                      Text(
+                        '${tracker.storedStockQuintals.toStringAsFixed(0)} ${isEn ? "Quintals" : "क्विंटल"}',
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
                       ),
                     ],
@@ -1190,7 +1077,7 @@ class _HomeViewState extends State<HomeView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      forecast.verdictBadge,
+                      forecast.getVerdictBadge(isEn),
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
@@ -1204,7 +1091,7 @@ class _HomeViewState extends State<HomeView> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        '${forecast.confidencePercent}% अचूकता',
+                        '${forecast.confidencePercent}% ${isEn ? "Accuracy" : "अचूकता"}',
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
@@ -1223,7 +1110,7 @@ class _HomeViewState extends State<HomeView> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('आजचा भाव', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                        Text(isEn ? "Today's Price" : 'आजचा भाव', style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
                         Text(
                           '₹${forecast.currentPrice.toStringAsFixed(0)}',
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
@@ -1238,7 +1125,10 @@ class _HomeViewState extends State<HomeView> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text('भाकीत भाव (${forecast.daysAhead} दिवस)', style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                        Text(
+                          isEn ? 'Forecast (${forecast.daysAhead} days)' : 'भाकीत भाव (${forecast.daysAhead} दिवस)',
+                          style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+                        ),
                         Text(
                           '₹${forecast.predictedPrice.toStringAsFixed(0)}',
                           style: TextStyle(
@@ -1263,7 +1153,9 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     child: Center(
                       child: Text(
-                        '💰 साठवून ठेवल्यास संभाव्य नफा: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)} अतिरिक्त',
+                        isEn
+                            ? '💰 Holding Stock Net Gain: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)} Extra'
+                            : '💰 साठवून ठेवल्यास संभाव्य नफा: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)} अतिरिक्त',
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w900,
@@ -1276,7 +1168,7 @@ class _HomeViewState extends State<HomeView> {
                 ],
 
                 Text(
-                  forecast.advisoryText,
+                  forecast.getAdvisory(isEn),
                   style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                 ),
               ],
@@ -1363,7 +1255,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   // --- 6. QUICK ACTIONS GRID ---
-  Widget _buildQuickActionsGrid(BuildContext context, AuthViewModel authVm) {
+  Widget _buildQuickActionsGrid(BuildContext context, AuthViewModel authVm, bool isEn) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -1376,8 +1268,8 @@ class _HomeViewState extends State<HomeView> {
           context,
           icon: Icons.account_balance_rounded,
           color: Colors.purple.shade700,
-          title: authVm.isMr ? 'शासकीय योजना व अनुदान' : 'Govt Schemes DBT',
-          subtitle: authVm.isMr ? 'सौर पंप, ठिबक व विमा' : 'Solar Pump & Drip',
+          title: isEn ? 'Govt Schemes DBT' : 'शासकीय योजना व अनुदान',
+          subtitle: isEn ? 'Solar Pump & Drip Subsidy' : 'सौर पंप, ठिबक व विमा',
           onTap: () {
             Navigator.push(
               context,
@@ -1389,8 +1281,8 @@ class _HomeViewState extends State<HomeView> {
           context,
           icon: Icons.account_balance_wallet_rounded,
           color: const Color(0xFF165B33),
-          title: authVm.isMr ? 'शेतकरी नफा-तोटा वही' : 'Farm Khata Ledger',
-          subtitle: authVm.isMr ? 'खर्च, विक्री व ROI' : 'Crop Expenses & P&L',
+          title: isEn ? 'Farm Khata Ledger' : 'शेतकरी नफा-तोटा वही',
+          subtitle: isEn ? 'Crop Expenses & P&L' : 'खर्च, विक्री व ROI',
           onTap: () {
             Navigator.push(
               context,
@@ -1402,8 +1294,8 @@ class _HomeViewState extends State<HomeView> {
           context,
           icon: Icons.grass_rounded,
           color: Colors.amber.shade900,
-          title: authVm.isMr ? 'आंतरपीक व फेरपालट' : 'Intercropping Planner',
-          subtitle: authVm.isMr ? '४:२ प्रमाण व खत बचत' : 'Dual Income & Nitrogen',
+          title: isEn ? 'Intercropping Planner' : 'आंतरपीक व फेरपालट',
+          subtitle: isEn ? 'Row Pattern & Yield' : '४:२ प्रमाण व खत बचत',
           onTap: () {
             Navigator.push(
               context,
@@ -1415,8 +1307,8 @@ class _HomeViewState extends State<HomeView> {
           context,
           icon: Icons.science_outlined,
           color: Colors.teal,
-          title: authVm.isMr ? 'माती परीक्षण सल्ला' : 'Soil Health & NPK',
-          subtitle: authVm.isMr ? 'ICAR खत मात्रा' : 'Fertilizer Dosage',
+          title: isEn ? 'Soil Health & NPK' : 'माती परीक्षण सल्ला',
+          subtitle: isEn ? 'ICAR Fertilizer Dosage' : 'ICAR खत मात्रा',
           onTap: () {
             Navigator.push(
               context,
@@ -1428,8 +1320,8 @@ class _HomeViewState extends State<HomeView> {
           context,
           icon: Icons.shopping_bag_outlined,
           color: Colors.indigo,
-          title: authVm.isMr ? 'कृषी इनपुट स्टोअर' : 'Agri Store',
-          subtitle: authVm.isMr ? 'खते, बियाणे, औषधे' : 'Direct Seeds & DAP',
+          title: isEn ? 'Agri Input Store' : 'कृषी इनपुट स्टोअर',
+          subtitle: isEn ? 'Fertilizers & Direct Seeds' : 'खते, बियाणे, औषधे',
           onTap: () {
             Navigator.push(
               context,

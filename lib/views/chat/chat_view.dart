@@ -17,6 +17,15 @@ class _ChatViewState extends State<ChatView> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authVm = context.read<AuthViewModel>();
+      context.read<ChatViewModel>().initGreetingForLocale(authVm.locale);
+    });
+  }
+
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -158,9 +167,9 @@ class _ChatViewState extends State<ChatView> {
                     children: [
                       Icon(chatVm.isPlaying ? Icons.pause : Icons.volume_up, color: AppColors.primary, size: 16),
                       const SizedBox(width: 4),
-                      const Text(
-                        'व्हॉईस नोट ऐका (Audio)',
-                        style: TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.bold),
+                      Text(
+                        Provider.of<AuthViewModel>(context, listen: false).isEn ? 'Listen to Voice Note' : 'व्हॉईस नोट ऐका (Audio)',
+                        style: const TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),

@@ -23,16 +23,24 @@ class _FarmKhataViewState extends State<FarmKhataView> {
     super.dispose();
   }
 
-  void _showAddEntryDialog(BuildContext context, KhataViewModel khataVm, {required bool isExpense}) {
+  void _showAddEntryDialog(BuildContext context, KhataViewModel khataVm, {required bool isExpense, required bool isEn}) {
     _amountController.clear();
     _notesController.clear();
 
-    String selectedCrop = 'सोयाबीन (Soybean)';
+    String selectedCrop = isEn ? 'Soybean' : 'सोयाबीन (Soybean)';
     final categories = isExpense ? KhataEntry.expenseCategories : KhataEntry.incomeCategories;
     String selectedCatId = categories.first['id']!;
-    String selectedCatLabel = categories.first['labelShort']!;
+    String selectedCatLabel = isEn ? (categories.first['labelShortEn'] ?? 'Fertilizers') : categories.first['labelShort']!;
 
-    final crops = [
+    final crops = isEn ? [
+      'Soybean',
+      'Cotton',
+      'Sugarcane',
+      'Onion',
+      'Tur / Arhar',
+      'Vegetables',
+      'General Farm',
+    ] : [
       'सोयाबीन (Soybean)',
       'कापूस (Cotton)',
       'ऊस (Sugarcane)',
@@ -77,7 +85,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    isExpense ? 'नवीन खर्च नोंदवा (Add Expense)' : 'नवीन उत्पन्न नोंदवा (Add Income)',
+                    isExpense ? (isEn ? 'Add New Farm Expense' : 'नवीन खर्च नोंदवा (Add Expense)') : (isEn ? 'Add New Farm Income' : 'नवीन उत्पन्न नोंदवा (Add Income)'),
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                   ),
                 ],
@@ -85,7 +93,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
               const SizedBox(height: 14),
 
               // Crop Dropdown
-              const Text('संबंधित पीक:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+              Text(isEn ? 'Associated Crop:' : 'संबंधित पीक:', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               DropdownButtonFormField<String>(
                 value: selectedCrop,
@@ -101,18 +109,19 @@ class _FarmKhataViewState extends State<FarmKhataView> {
               const SizedBox(height: 12),
 
               // Category Selector
-              const Text('खर्च / उत्पन्नाचा प्रकार:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+              Text(isEn ? 'Category:' : 'खर्च / उत्पन्नाचा प्रकार:', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: categories.map((cat) {
                     final isSel = selectedCatId == cat['id'];
+                    final label = isEn ? (cat['labelShortEn'] ?? cat['labelShort']!) : cat['labelShort']!;
                     return Padding(
                       padding: const EdgeInsets.only(right: 6),
                       child: ChoiceChip(
                         label: Text(
-                          cat['labelShort']!,
+                          label,
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
@@ -128,7 +137,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
                           if (selected) {
                             setModalState(() {
                               selectedCatId = cat['id']!;
-                              selectedCatLabel = cat['labelShort']!;
+                              selectedCatLabel = isEn ? (cat['labelShortEn'] ?? cat['labelShort']!) : cat['labelShort']!;
                             });
                           }
                         },
@@ -140,7 +149,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
               const SizedBox(height: 12),
 
               // Amount Input
-              const Text('रक्कम (₹ Amount):', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+              Text(isEn ? 'Amount (₹):' : 'रक्कम (₹ Amount):', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               TextField(
                 controller: _amountController,
@@ -176,12 +185,12 @@ class _FarmKhataViewState extends State<FarmKhataView> {
               const SizedBox(height: 12),
 
               // Notes Input
-              const Text('तपशील / टीप (पर्यायी):', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+              Text(isEn ? 'Details / Note (Optional):' : 'तपशील / टीप (पर्यायी):', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               TextField(
                 controller: _notesController,
                 decoration: InputDecoration(
-                  hintText: 'उदा. २ पोती DAP किंवा ५ मजुरांची मजुरी',
+                  hintText: isEn ? 'e.g. 2 bags DAP or 5 labor charges' : 'उदा. २ पोती DAP किंवा ५ मजुरांची मजुरी',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
@@ -196,7 +205,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
                     final amt = double.tryParse(_amountController.text.trim()) ?? 0.0;
                     if (amt <= 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('कृपया योग्य रक्कम टाका'), backgroundColor: Colors.red),
+                        SnackBar(content: Text(isEn ? 'Please enter a valid amount' : 'कृपया योग्य रक्कम टाका'), backgroundColor: Colors.red),
                       );
                       return;
                     }
@@ -213,7 +222,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(isExpense ? '✓ खर्च यशस्वीरीत्या नोंदवला!' : '✓ उत्पन्न यशस्वीरीत्या नोंदवले!'),
+                        content: Text(isExpense ? (isEn ? '✓ Expense logged successfully!' : '✓ खर्च यशस्वीरीत्या नोंदवला!') : (isEn ? '✓ Income logged successfully!' : '✓ उत्पन्न यशस्वीरीत्या नोंदवले!')),
                         backgroundColor: isExpense ? Colors.red.shade700 : AppColors.primary,
                       ),
                     );
@@ -224,7 +233,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text(
-                    isExpense ? 'खर्च सेव्ह करा' : 'उत्पन्न सेव्ह करा',
+                    isExpense ? (isEn ? 'Save Expense' : 'खर्च सेव्ह करा') : (isEn ? 'Save Income' : 'उत्पन्न सेव्ह करा'),
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                 ),
@@ -241,19 +250,21 @@ class _FarmKhataViewState extends State<FarmKhataView> {
     final khataVm = context.watch<KhataViewModel>();
     final authVm = context.watch<AuthViewModel>();
 
+    final isEn = authVm.isEn;
+
     final crops = [
-      {'id': 'all', 'label': 'सर्व पिके (All)'},
-      {'id': 'सोयाबीन', 'label': '🌱 सोयाबीन'},
-      {'id': 'कापूस', 'label': '☁️ कापूस'},
-      {'id': 'ऊस', 'label': '🎋 ऊस'},
-      {'id': 'कांदा', 'label': '🧅 कांदा'},
+      {'id': 'all', 'label': isEn ? 'All Crops' : 'सर्व पिके (All)'},
+      {'id': 'सोयाबीन', 'label': isEn ? '🌱 Soybean' : '🌱 सोयाबीन'},
+      {'id': 'कापूस', 'label': isEn ? '☁️ Cotton' : '☁️ कापूस'},
+      {'id': 'ऊस', 'label': isEn ? '🎋 Sugarcane' : '🎋 ऊस'},
+      {'id': 'कांदा', 'label': isEn ? '🧅 Onion' : '🧅 कांदा'},
     ];
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
-          authVm.isMr ? 'शेतकरी नफा-तोटा वही (Farm Khata)' : 'Farm P&L Ledger',
+          isEn ? 'Farm P&L Ledger (Khata)' : 'शेतकरी नफा-तोटा वही (Farm Khata)',
           style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17),
         ),
       ),
@@ -283,7 +294,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        authVm.isMr ? 'हातात उरलेला निव्वळ नफा' : 'Net In-Hand Profit',
+                        isEn ? 'Net In-Hand Profit' : 'हातात उरलेला निव्वळ नफा',
                         style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 12),
                       ),
                       Container(
@@ -319,7 +330,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'एकूण विक्री उत्पन्न (Revenue)',
+                              isEn ? 'Total Revenue (Income)' : 'एकूण विक्री उत्पन्न (Revenue)',
                               style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 10),
                             ),
                             Text(
@@ -336,7 +347,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'एकूण खर्च (Expenses)',
+                              isEn ? 'Total Expenses' : 'एकूण खर्च (Expenses)',
                               style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 10),
                             ),
                             Text(
@@ -358,9 +369,9 @@ class _FarmKhataViewState extends State<FarmKhataView> {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => _showAddEntryDialog(context, khataVm, isExpense: true),
+                    onPressed: () => _showAddEntryDialog(context, khataVm, isExpense: true, isEn: isEn),
                     icon: const Icon(Icons.remove_circle, size: 18),
-                    label: const Text('खर्च नोंदवा', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    label: Text(isEn ? 'Add Expense' : 'खर्च नोंदवा', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade700,
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -371,9 +382,9 @@ class _FarmKhataViewState extends State<FarmKhataView> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => _showAddEntryDialog(context, khataVm, isExpense: false),
+                    onPressed: () => _showAddEntryDialog(context, khataVm, isExpense: false, isEn: isEn),
                     icon: const Icon(Icons.add_circle, size: 18),
-                    label: const Text('उत्पन्न नोंदवा', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    label: Text(isEn ? 'Add Income' : 'उत्पन्न नोंदवा', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -422,8 +433,12 @@ class _FarmKhataViewState extends State<FarmKhataView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'खर्च व जमा व्यवहार इतिहास (History):',
+                Text(
+                  isEn ? 'Transaction History:' : 'खर्च व जमा व्यवहार इतिहास (History):',
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                ),
+                Text(
+                  '${khataVm.filteredEntries.length} ${isEn ? "entries" : "नोंदी"}',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                 ),
                 Text(
@@ -465,7 +480,7 @@ class _FarmKhataViewState extends State<FarmKhataView> {
                           Row(
                             children: [
                               Text(
-                                e.categoryLabelMr,
+                                isEn ? (e.isExpense ? (KhataEntry.expenseCategories.firstWhere((c) => c['id'] == e.category, orElse: () => {})['labelShortEn'] ?? e.categoryLabelMr) : (KhataEntry.incomeCategories.firstWhere((c) => c['id'] == e.category, orElse: () => {})['labelShortEn'] ?? e.categoryLabelMr)) : e.categoryLabelMr,
                                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(width: 6),

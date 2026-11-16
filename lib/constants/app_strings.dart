@@ -1,4 +1,4 @@
-﻿class AppStrings {
+class AppStrings {
   static const Map<String, Map<String, dynamic>> _localizedValues = {
     'en': {
       'appName': 'AgriPulse',
@@ -709,8 +709,8 @@
   static String get(String key, {String locale = 'en'}) {
     final lang = _localizedValues.containsKey(locale) ? locale : 'en';
     return _localizedValues[lang]?[key] ??
-        _localizedValues['mr']?[key] ??
         _localizedValues['en']?[key] ??
+        _localizedValues['mr']?[key] ??
         key;
   }
 }

@@ -13,6 +13,7 @@ class StoreView extends StatelessWidget {
     final authVm = context.watch<AuthViewModel>();
     final storeVm = context.watch<StoreViewModel>();
     final loc = authVm.locale;
+    final isEn = authVm.isEn;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -30,10 +31,10 @@ class StoreView extends StatelessWidget {
               backgroundColor: AppColors.primary,
               icon: const Icon(Icons.shopping_cart, color: Colors.white),
               label: Text(
-                '${storeVm.cartCount} वस्तू • ₹${storeVm.cartTotal.toStringAsFixed(0)}',
+                '${storeVm.cartCount} ${isEn ? "items" : "वस्तू"} • ₹${storeVm.cartTotal.toStringAsFixed(0)}',
                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
-              onPressed: () => _showCartSheet(context, storeVm),
+              onPressed: () => _showCartSheet(context, storeVm, isEn),
             )
           : null,
       body: Column(
@@ -46,10 +47,10 @@ class StoreView extends StatelessWidget {
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
-                _buildCategoryTab(storeVm, 'all', 'सर्व (All)'),
-                _buildCategoryTab(storeVm, 'fertilizers', 'खते (Fertilizers)'),
-                _buildCategoryTab(storeVm, 'pesticides', 'कीटकनाशके (Pesticides)'),
-                _buildCategoryTab(storeVm, 'seeds', 'बियाणे (Seeds)'),
+                _buildCategoryTab(storeVm, 'all', isEn ? 'All' : 'सर्व (All)'),
+                _buildCategoryTab(storeVm, 'fertilizers', isEn ? 'Fertilizers' : 'खते (Fertilizers)'),
+                _buildCategoryTab(storeVm, 'pesticides', isEn ? 'Pesticides' : 'कीटकनाशके (Pesticides)'),
+                _buildCategoryTab(storeVm, 'seeds', isEn ? 'Seeds' : 'बियाणे (Seeds)'),
               ],
             ),
           ),
@@ -92,7 +93,7 @@ class StoreView extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              p.localName.isNotEmpty ? p.localName : p.name,
+                              isEn ? p.name : (p.localName.isNotEmpty ? p.localName : p.name),
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -143,7 +144,7 @@ class StoreView extends StatelessWidget {
     );
   }
 
-  void _showCartSheet(BuildContext context, StoreViewModel storeVm) {
+  void _showCartSheet(BuildContext context, StoreViewModel storeVm, bool isEn) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
@@ -153,14 +154,14 @@ class StoreView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('माझी खरेदी (Cart)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+              Text(isEn ? 'My Cart' : 'माझी खरेदी (Cart)', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
               const SizedBox(height: 12),
               ...storeVm.cart.map((item) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('${item.product.localName} x ${item.quantity}'),
+                        Text('${isEn ? item.product.name : item.product.localName} x ${item.quantity}'),
                         Text('₹${item.total.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
@@ -169,7 +170,7 @@ class StoreView extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('एकूण रक्कम (Total):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                  Text(isEn ? 'Total Amount:' : 'एकूण रक्कम (Total):', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                   Text(
                     '₹${storeVm.cartTotal.toStringAsFixed(0)}',
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.primary),
@@ -182,7 +183,7 @@ class StoreView extends StatelessWidget {
                   Navigator.pop(context);
                   storeVm.clearCart();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('खतांची मागणी नोंदवली गेली आहे! लवकरच संपर्क साधण्यात येईल.')),
+                    SnackBar(content: Text(isEn ? 'Order placed successfully! We will contact you shortly.' : 'खतांची मागणी नोंदवली गेली आहे! लवकरच संपर्क साधण्यात येईल.')),
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -190,7 +191,7 @@ class StoreView extends StatelessWidget {
                   minimumSize: const Size.fromHeight(44),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('मागणी नोंदवा (Submit Order)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: Text(isEn ? 'Submit Order' : 'मागणी नोंदवा (Submit Order)', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
           ),

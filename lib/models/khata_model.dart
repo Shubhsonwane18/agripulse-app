@@ -49,21 +49,21 @@ class KhataEntry {
   }
 
   static const List<Map<String, String>> expenseCategories = [
-    {'id': 'fertilizers', 'label': '🧪 रासायनिक व सेंद्रिय खते', 'labelShort': 'खते'},
-    {'id': 'seeds', 'label': '🌱 बियाणे खरेदी', 'labelShort': 'बियाणे'},
-    {'id': 'pesticides', 'label': '🧴 कीटकनाशक व बुरशीनाशक', 'labelShort': 'कीटकनाशक'},
-    {'id': 'labor', 'label': '👷 मजुरी, खुरपणी व फवारणी', 'labelShort': 'मजुरी'},
-    {'id': 'machinery', 'label': '🚜 ट्रॅक्टर नांगरणी व मळणी', 'labelShort': 'ट्रॅक्टर भाडे'},
-    {'id': 'transport', 'label': '🚚 वाहतूक, टोल व हमाली', 'labelShort': 'वाहतूक'},
-    {'id': 'irrigation_cost', 'label': '💧 पाणी, वीज व सिंचन', 'labelShort': 'सिंचन खर्च'},
-    {'id': 'other', 'label': '📦 इतर किरकोळ खर्च', 'labelShort': 'इतर खर्च'},
+    {'id': 'fertilizers', 'label': '🧪 रासायनिक व सेंद्रिय खते', 'labelShort': 'खते', 'labelEn': '🧪 Fertilizers & Nutrients', 'labelShortEn': 'Fertilizers'},
+    {'id': 'seeds', 'label': '🌱 बियाणे खरेदी', 'labelShort': 'बियाणे', 'labelEn': '🌱 Seeds Purchase', 'labelShortEn': 'Seeds'},
+    {'id': 'pesticides', 'label': '🧴 कीटकनाशक व बुरशीनाशक', 'labelShort': 'कीटकनाशक', 'labelEn': '🧴 Pesticides & Fungicides', 'labelShortEn': 'Pesticides'},
+    {'id': 'labor', 'label': '👷 मजुरी, खुरपणी व फवारणी', 'labelShort': 'मजुरी', 'labelEn': '👷 Labor & Weeding Wages', 'labelShortEn': 'Labor'},
+    {'id': 'machinery', 'label': '🚜 ट्रॅक्टर नांगरणी व मळणी', 'labelShort': 'ट्रॅक्टर भाडे', 'labelEn': '🚜 Tractor & Machinery Rent', 'labelShortEn': 'Machinery'},
+    {'id': 'transport', 'label': '🚚 वाहतूक, टोल व हमाली', 'labelShort': 'वाहतूक', 'labelEn': '🚚 Transport, Toll & Handling', 'labelShortEn': 'Transport'},
+    {'id': 'irrigation_cost', 'label': '💧 पाणी, वीज व सिंचन', 'labelShort': 'सिंचन खर्च', 'labelEn': '💧 Irrigation & Electricity', 'labelShortEn': 'Irrigation'},
+    {'id': 'other', 'label': '📦 इतर किरकोळ खर्च', 'labelShort': 'इतर खर्च', 'labelEn': '📦 Other Farm Expenses', 'labelShortEn': 'Other'},
   ];
 
   static const List<Map<String, String>> incomeCategories = [
-    {'id': 'mandi_sale', 'label': '💰 बाजार समिती (APMC) विक्री', 'labelShort': 'मंडी विक्री'},
-    {'id': 'local_trader_sale', 'label': '🏪 स्थानिक व्यापारी खरेदी', 'labelShort': 'व्यापारी विक्री'},
-    {'id': 'direct_customer_sale', 'label': '🛒 थेट ग्राहक विक्री', 'labelShort': 'थेट विक्री'},
-    {'id': 'dbt_subsidy_income', 'label': '🏛️ सरकारी अनुदान (DBT जमा)', 'labelShort': 'सरकारी अनुदान'},
+    {'id': 'mandi_sale', 'label': '💰 बाजार समिती (APMC) विक्री', 'labelShort': 'मंडी विक्री', 'labelEn': '💰 APMC Mandi Sale', 'labelShortEn': 'Mandi Sale'},
+    {'id': 'local_trader_sale', 'label': '🏪 स्थानिक व्यापारी खरेदी', 'labelShort': 'व्यापारी विक्री', 'labelEn': '🏪 Local Trader Sale', 'labelShortEn': 'Trader Sale'},
+    {'id': 'direct_customer_sale', 'label': '🛒 थेट ग्राहक विक्री', 'labelShort': 'थेट विक्री', 'labelEn': '🛒 Direct Customer Sale', 'labelShortEn': 'Direct Sale'},
+    {'id': 'dbt_subsidy_income', 'label': '🏛️ सरकारी अनुदान (DBT जमा)', 'labelShort': 'सरकारी अनुदान', 'labelEn': '🏛️ Govt DBT Subsidy Deposit', 'labelShortEn': 'DBT Subsidy'},
   ];
 
   static List<KhataEntry> getDefaultSampleEntries() {

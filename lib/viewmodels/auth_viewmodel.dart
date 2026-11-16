@@ -167,8 +167,10 @@ class AuthViewModel extends ChangeNotifier {
     return false;
   }
 
-  // Update profile details (village, acreage, coordinates)
+  // Update profile details (name, phone, village, acreage, coordinates)
   Future<void> updateProfile({
+    String? fullName,
+    String? phone,
     String? state,
     String? district,
     String? village,
@@ -179,6 +181,8 @@ class AuthViewModel extends ChangeNotifier {
     if (_currentUser == null) return;
 
     _currentUser = _currentUser!.copyWith(
+      fullName: fullName,
+      phone: phone,
       state: state,
       district: district,
       village: village,

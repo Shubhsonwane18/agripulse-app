@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../constants/supported_languages.dart';
+import '../../models/user_model.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../auth/login_view.dart';
 import '../language/language_selection_view.dart';
@@ -10,11 +11,171 @@ import '../language/language_selection_view.dart';
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
 
+  void _showEditProfileDialog(BuildContext context, AuthViewModel authVm, UserProfile? user) {
+    final nameCtrl = TextEditingController(text: user?.fullName ?? '');
+    final phoneCtrl = TextEditingController(text: user?.phone ?? '');
+    final villageCtrl = TextEditingController(text: user?.village ?? 'Shirol');
+    final districtCtrl = TextEditingController(text: user?.district ?? 'Kolhapur');
+    final acresCtrl = TextEditingController(text: (user?.landSizeAcres ?? 4.5).toString());
+    final isEn = authVm.isEn;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 20),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.edit_note_rounded, color: AppColors.primary, size: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    isEn ? 'Edit Farm & Profile Details' : 'शेतकरी व शेतजमीन तपशील संपादित करा',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(isEn ? 'Farmer Full Name:' : 'शेतकऱ्याचे पूर्ण नाव:', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              TextField(
+                controller: nameCtrl,
+                decoration: InputDecoration(
+                  hintText: isEn ? 'e.g. Ramesh Patil' : 'उदा. रमेश पाटील',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(isEn ? 'Mobile / WhatsApp Number:' : 'मोबाईल / व्हॉट्सअ‍ॅप नंबर:', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              TextField(
+                controller: phoneCtrl,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  hintText: '+91 98220 12345',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(isEn ? 'Village:' : 'गाव:', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        TextField(
+                          controller: villageCtrl,
+                          decoration: InputDecoration(
+                            hintText: isEn ? 'e.g. Shirol' : 'उदा. शिरोळ',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(isEn ? 'District:' : 'जिल्हा:', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        TextField(
+                          controller: districtCtrl,
+                          decoration: InputDecoration(
+                            hintText: isEn ? 'e.g. Kolhapur' : 'उदा. कोल्हापूर',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(isEn ? 'Total Farmland (Acres):' : 'एकूण शेतजमीन (एकर):', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              TextField(
+                controller: acresCtrl,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  hintText: '4.5',
+                  suffixText: isEn ? 'Acres' : 'एकर',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final acres = double.tryParse(acresCtrl.text.trim()) ?? (user?.landSizeAcres ?? 4.5);
+                    await authVm.updateProfile(
+                      fullName: nameCtrl.text.trim().isNotEmpty ? nameCtrl.text.trim() : user?.fullName,
+                      phone: phoneCtrl.text.trim().isNotEmpty ? phoneCtrl.text.trim() : user?.phone,
+                      village: villageCtrl.text.trim().isNotEmpty ? villageCtrl.text.trim() : user?.village,
+                      district: districtCtrl.text.trim().isNotEmpty ? districtCtrl.text.trim() : user?.district,
+                      landSizeAcres: acres,
+                    );
+                    if (ctx.mounted) Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(isEn ? '✓ Profile details saved successfully!' : '✓ शेतकरी तपशील यशस्वीरीत्या सेव्ह केला!'),
+                        backgroundColor: AppColors.primary,
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    isEn ? 'Save Details' : 'माहिती सेव्ह करा',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authVm = context.watch<AuthViewModel>();
     final user = authVm.currentUser;
     final loc = authVm.locale;
+    final isEn = authVm.isEn;
     final currentLang = SupportedLanguages.findByCode(loc);
 
     return Scaffold(
@@ -46,13 +207,13 @@ class ProfileView extends StatelessWidget {
                     radius: 36,
                     backgroundColor: AppColors.primaryLight,
                     child: Text(
-                      user?.fullName.isNotEmpty == true ? user!.fullName[0] : 'श',
+                      user?.fullName.isNotEmpty == true ? user!.fullName[0] : (isEn ? 'F' : 'श'),
                       style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.primary),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    user?.fullName ?? 'शेतकरी (Farmer)',
+                    user?.fullName.isNotEmpty == true ? user!.fullName : (isEn ? 'Farmer' : 'शेतकरी (Farmer)'),
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                   ),
                   Text(
@@ -67,8 +228,22 @@ class ProfileView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '📍 ${user?.village ?? "शिरोळ"}, ${user?.district ?? "कोल्हापूर"} • ${user?.landSizeAcres ?? 4.5} एकर',
+                      '📍 ${user?.village ?? (isEn ? "Shirol" : "शिरोळ")}, ${user?.district ?? (isEn ? "Kolhapur" : "कोल्हापूर")} • ${user?.landSizeAcres ?? 4.5} ${isEn ? "Acres" : "एकर"}',
                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: () => _showEditProfileDialog(context, authVm, user),
+                    icon: const Icon(Icons.edit, size: 16, color: AppColors.primary),
+                    label: Text(
+                      isEn ? 'Edit Farm Profile Details' : 'तपशील बदला / संपादित करा (Edit)',
+                      style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.primary),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     ),
                   ),
                 ],
@@ -92,9 +267,9 @@ class ProfileView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Web & App ऑटोमॅटिक सिंक',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
+                        Text(
+                          isEn ? 'Automatic Cloud Data Sync' : 'Web & App ऑटोमॅटिक सिंक',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
                         ),
                         Text(
                           AppStrings.get('syncNotice', locale: loc),
@@ -142,9 +317,9 @@ class ProfileView extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.primary),
-                        label: const Text(
-                          'सर्व भाषा (All)',
-                          style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
+                        label: Text(
+                          isEn ? 'All Languages' : 'सर्व भाषा (All)',
+                          style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -198,9 +373,9 @@ class ProfileView extends StatelessWidget {
                               color: AppColors.primary,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Text(
-                              'सक्रिय / Active',
-                              style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            child: Text(
+                              isEn ? 'Active' : 'सक्रिय / Active',
+                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],

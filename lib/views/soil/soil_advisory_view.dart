@@ -66,23 +66,35 @@ class SoilAdvisoryView extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      res.cropSuitability,
+                      res.getSuitability(authVm.isEn),
                       style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                     ),
                     const Divider(height: 20),
 
                     // Fertilizer Bags Breakdown
-                    const Text(
-                      'शिफारस केलेली खतांची मात्रा (Bags Needed):',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    Text(
+                      authVm.isEn ? 'Recommended Fertilizer Dosage (Bags Needed):' : 'शिफारस केलेली खतांची मात्रा (Bags Needed):',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buildFertilizerPill('युरिया (Urea)', '${res.ureaBags.toStringAsFixed(1)} गोण्या', Colors.green),
-                        _buildFertilizerPill('डीएपी (DAP)', '${res.dapBags.toStringAsFixed(1)} गोण्या', Colors.blue),
-                        _buildFertilizerPill('एमओपी (MOP)', '${res.mopBags.toStringAsFixed(1)} गोण्या', Colors.purple),
+                        _buildFertilizerPill(
+                          authVm.isEn ? 'Urea' : 'युरिया (Urea)',
+                          '${res.ureaBags.toStringAsFixed(1)} ${authVm.isEn ? "Bags" : "गोण्या"}',
+                          Colors.green,
+                        ),
+                        _buildFertilizerPill(
+                          authVm.isEn ? 'DAP' : 'डीएपी (DAP)',
+                          '${res.dapBags.toStringAsFixed(1)} ${authVm.isEn ? "Bags" : "गोण्या"}',
+                          Colors.blue,
+                        ),
+                        _buildFertilizerPill(
+                          authVm.isEn ? 'MOP (Potash)' : 'एमओपी (MOP)',
+                          '${res.mopBags.toStringAsFixed(1)} ${authVm.isEn ? "Bags" : "गोण्या"}',
+                          Colors.purple,
+                        ),
                       ],
                     ),
                   ],
@@ -102,35 +114,35 @@ class SoilAdvisoryView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'माती तपासणी आकडेवारी (Soil Test Values)',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                  Text(
+                    authVm.isEn ? 'Soil Lab Test Values (NPK & pH)' : 'माती तपासणी आकडेवारी (Soil Test Values)',
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 12),
 
                   _buildSlider(
-                    label: 'नत्र / Nitrogen (kg/ha)',
+                    label: authVm.isEn ? 'Nitrogen / N (kg/ha)' : 'नत्र / Nitrogen (kg/ha)',
                     value: input.nitrogen,
                     min: 100,
                     max: 500,
                     onChanged: (v) => soilVm.updateInputs(nitrogen: v),
                   ),
                   _buildSlider(
-                    label: 'स्फुरद / Phosphorus (kg/ha)',
+                    label: authVm.isEn ? 'Phosphorus / P (kg/ha)' : 'स्फुरद / Phosphorus (kg/ha)',
                     value: input.phosphorus,
                     min: 5,
                     max: 60,
                     onChanged: (v) => soilVm.updateInputs(phosphorus: v),
                   ),
                   _buildSlider(
-                    label: 'पालाश / Potassium (kg/ha)',
+                    label: authVm.isEn ? 'Potassium / K (kg/ha)' : 'पालाश / Potassium (kg/ha)',
                     value: input.potassium,
                     min: 80,
                     max: 600,
                     onChanged: (v) => soilVm.updateInputs(potassium: v),
                   ),
                   _buildSlider(
-                    label: 'सामू / pH Level',
+                    label: authVm.isEn ? 'Soil pH Level' : 'सामू / pH Level',
                     value: input.ph,
                     min: 5.0,
                     max: 9.0,
