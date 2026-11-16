@@ -119,9 +119,9 @@ class WeatherView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.emerald.shade50,
+              color: AppColors.accentLight,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.emerald.shade200),
+              border: Border.all(color: AppColors.accent),
             ),
             child: const Text(
               'IMD Calibrated',
@@ -137,7 +137,7 @@ class WeatherView extends StatelessWidget {
     final isSafe = weatherVm.isSafeToSpray;
     final report = weatherVm.weatherReport;
     final bgColor = isSafe ? AppColors.successBg : AppColors.dangerBg;
-    final borderColor = isSafe ? Colors.emerald.shade300 : Colors.rose.shade300;
+    final borderColor = isSafe ? AppColors.accent : AppColors.danger;
     final textColor = isSafe ? AppColors.success : AppColors.danger;
 
     return Container(
@@ -220,11 +220,11 @@ class WeatherView extends StatelessWidget {
           final isConvective = slot.isConvectiveRisk;
 
           Color cardBg = isSafe
-              ? Colors.emerald.shade50
-              : (isConvective ? Colors.amber.shade50 : Colors.rose.shade50);
+              ? AppColors.successBg
+              : (isConvective ? AppColors.warningBg : AppColors.dangerBg);
           Color borderCol = isSafe
-              ? Colors.emerald.shade200
-              : (isConvective ? Colors.amber.shade300 : Colors.rose.shade200);
+              ? AppColors.accent
+              : (isConvective ? Colors.amber.shade300 : AppColors.danger);
 
           return Container(
             width: 110,
@@ -253,14 +253,14 @@ class WeatherView extends StatelessWidget {
                     ),
                     Text(
                       '💨 ${slot.windSpeed}km/h',
-                      style: const TextStyle(fontSize: 9, color: Colors.black800),
+                      style: const TextStyle(fontSize: 9, color: AppColors.textPrimary),
                     ),
                   ],
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: isSafe ? AppColors.primary : Colors.rose.shade600,
+                    color: isSafe ? AppColors.primary : AppColors.danger,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(

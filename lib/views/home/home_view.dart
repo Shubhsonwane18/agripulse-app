@@ -198,7 +198,7 @@ class HomeView extends StatelessWidget {
   ) {
     final isSafe = weatherVm.isSafeToSpray;
     final bgColor = isSafe ? AppColors.successBg : AppColors.dangerBg;
-    final borderColor = isSafe ? Colors.emerald.shade200 : Colors.rose.shade200;
+    final borderColor = isSafe ? AppColors.accentLight : AppColors.danger;
     final textColor = isSafe ? AppColors.success : AppColors.danger;
 
     return Container(
@@ -271,7 +271,6 @@ class HomeView extends StatelessWidget {
     String loc,
   ) {
     final best = mandiVm.bestMandi;
-    final nearest = mandiVm.nearestMandi;
     final delta = mandiVm.netProfitDelta;
 
     return Container(
@@ -299,16 +298,16 @@ class HomeView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.emerald.shade50,
+                    color: AppColors.accentLight,
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.emerald.shade200),
+                    border: Border.all(color: AppColors.accent),
                   ),
                   child: Text(
                     '+₹${delta.toStringAsFixed(0)} नफा',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: Colors.emerald.shade800,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),

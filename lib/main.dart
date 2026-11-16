@@ -66,7 +66,6 @@ class AgriPulseApp extends StatelessWidget {
           seedColor: AppColors.primary,
           primary: AppColors.primary,
           secondary: AppColors.accent,
-          background: AppColors.background,
           surface: AppColors.surface,
         ),
         scaffoldBackgroundColor: AppColors.background,
@@ -75,7 +74,7 @@ class AgriPulseApp extends StatelessWidget {
           foregroundColor: Colors.white,
           elevation: 0,
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(

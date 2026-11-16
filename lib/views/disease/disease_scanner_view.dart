@@ -215,15 +215,15 @@ class DiseaseScannerView extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.emerald.shade100,
+                      color: AppColors.accentLight,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       '${(res.confidence * 100).toStringAsFixed(0)}% AI अचूकता',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: Colors.emerald.shade900,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
@@ -242,7 +242,7 @@ class DiseaseScannerView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isWeatherSafe ? AppColors.successBg : AppColors.dangerBg,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: isWeatherSafe ? Colors.emerald.shade300 : Colors.rose.shade300),
+                  border: Border.all(color: isWeatherSafe ? AppColors.accent : AppColors.danger),
                 ),
                 child: Row(
                   children: [

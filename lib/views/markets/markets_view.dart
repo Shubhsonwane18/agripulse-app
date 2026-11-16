@@ -214,7 +214,7 @@ class MarketsView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: isRank1 ? Colors.white : Colors.black800,
+                        color: isRank1 ? Colors.white : Colors.black87,
                       ),
                     ),
                   ),
@@ -263,10 +263,10 @@ class MarketsView extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Text('वाहतूक व सेस खर्च', style: TextStyle(fontSize: 10, color: Colors.rose)),
+                  const Text('वाहतूक व सेस खर्च', style: TextStyle(fontSize: 10, color: AppColors.danger)),
                   Text(
                     '-₹${eval.logisticsOverhead.toStringAsFixed(0)}',
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.rose),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.danger),
                   ),
                 ],
               ),
