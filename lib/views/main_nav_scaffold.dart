@@ -10,6 +10,9 @@ import 'disease/disease_scanner_view.dart';
 import 'chat/chat_view.dart';
 import 'soil/soil_advisory_view.dart';
 import 'store/store_view.dart';
+import 'schemes/schemes_view.dart';
+import 'khata/farm_khata_view.dart';
+import 'intercropping/intercropping_view.dart';
 import 'profile/profile_view.dart';
 
 class MainNavScaffold extends StatefulWidget {
@@ -125,6 +128,30 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
               },
             ),
             const Divider(),
+            ListTile(
+              leading: const Icon(Icons.account_balance, color: Colors.purple),
+              title: const Text('शासकीय योजना व थेट अनुदान (DBT)'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SchemesView()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_balance_wallet, color: Color(0xFF165B33)),
+              title: const Text('शेतकरी नफा-तोटा वही (Farm Khata)'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmKhataView()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.grass, color: Colors.amber),
+              title: const Text('आंतरपीक व फेरपालट मार्गदर्शक'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const IntercroppingView()));
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.science, color: Colors.teal),
               title: Text(AppStrings.get('navSoil', locale: loc)),

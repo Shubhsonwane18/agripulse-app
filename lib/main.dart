@@ -12,6 +12,9 @@ import 'viewmodels/disease_viewmodel.dart';
 import 'viewmodels/chat_viewmodel.dart';
 import 'viewmodels/soil_viewmodel.dart';
 import 'viewmodels/store_viewmodel.dart';
+import 'viewmodels/scheme_viewmodel.dart';
+import 'viewmodels/khata_viewmodel.dart';
+import 'viewmodels/intercropping_viewmodel.dart';
 import 'views/main_nav_scaffold.dart';
 import 'views/auth/login_view.dart';
 import 'views/language/language_selection_view.dart';
@@ -45,6 +48,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ChatViewModel(apiService: apiService)),
         ChangeNotifierProvider(create: (_) => SoilViewModel()),
         ChangeNotifierProvider(create: (_) => StoreViewModel(apiService: apiService)),
+        ChangeNotifierProvider(create: (_) => SchemeViewModel()),
+        ChangeNotifierProvider(create: (_) => KhataViewModel()),
+        ChangeNotifierProvider(create: (_) => IntercroppingViewModel()),
       ],
       child: const AgriPulseApp(),
     ),

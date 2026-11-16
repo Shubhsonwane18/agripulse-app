@@ -12,6 +12,9 @@ import '../../viewmodels/mandi_viewmodel.dart';
 import '../../viewmodels/soil_viewmodel.dart';
 import '../soil/soil_advisory_view.dart';
 import '../store/store_view.dart';
+import '../schemes/schemes_view.dart';
+import '../khata/farm_khata_view.dart';
+import '../intercropping/intercropping_view.dart';
 import '../language/language_selection_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -1367,8 +1370,47 @@ class _HomeViewState extends State<HomeView> {
       crossAxisCount: 2,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
-      childAspectRatio: 1.6,
+      childAspectRatio: 1.55,
       children: [
+        _buildActionTile(
+          context,
+          icon: Icons.account_balance_rounded,
+          color: Colors.purple.shade700,
+          title: authVm.isMr ? 'शासकीय योजना व अनुदान' : 'Govt Schemes DBT',
+          subtitle: authVm.isMr ? 'सौर पंप, ठिबक व विमा' : 'Solar Pump & Drip',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SchemesView()),
+            );
+          },
+        ),
+        _buildActionTile(
+          context,
+          icon: Icons.account_balance_wallet_rounded,
+          color: const Color(0xFF165B33),
+          title: authVm.isMr ? 'शेतकरी नफा-तोटा वही' : 'Farm Khata Ledger',
+          subtitle: authVm.isMr ? 'खर्च, विक्री व ROI' : 'Crop Expenses & P&L',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const FarmKhataView()),
+            );
+          },
+        ),
+        _buildActionTile(
+          context,
+          icon: Icons.grass_rounded,
+          color: Colors.amber.shade900,
+          title: authVm.isMr ? 'आंतरपीक व फेरपालट' : 'Intercropping Planner',
+          subtitle: authVm.isMr ? '४:२ प्रमाण व खत बचत' : 'Dual Income & Nitrogen',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const IntercroppingView()),
+            );
+          },
+        ),
         _buildActionTile(
           context,
           icon: Icons.science_outlined,

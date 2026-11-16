@@ -7,11 +7,22 @@ class StorageService {
   static const String _keyProfile = 'kisanmitra_user_profile';
   static const String _keyLocale = 'kisanmitra_locale';
   static const String _keyLanguageSelected = 'kisanmitra_lang_selected_flag';
+  static const String _keyKhata = 'kisanmitra_khata_entries';
 
   static SharedPreferences? _prefs;
 
   static Future<void> init() async {
     _prefs ??= await SharedPreferences.getInstance();
+  }
+
+  // Khata Entries Persistence
+  static Future<void> saveKhataJson(String jsonStr) async {
+    await init();
+    await _prefs!.setString(_keyKhata, jsonStr);
+  }
+
+  static String? getKhataJson() {
+    return _prefs?.getString(_keyKhata);
   }
 
   // Language Selected Flag
