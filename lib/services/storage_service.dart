@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
@@ -6,13 +6,22 @@ class StorageService {
   static const String _keyToken = 'kisanmitra_auth_token';
   static const String _keyProfile = 'kisanmitra_user_profile';
   static const String _keyLocale = 'kisanmitra_locale';
-  static const String _keyCart = 'kisanmitra_cart';
-  static const String _keyLastWeather = 'kisanmitra_last_weather';
+  static const String _keyLanguageSelected = 'kisanmitra_lang_selected_flag';
 
   static SharedPreferences? _prefs;
 
   static Future<void> init() async {
     _prefs ??= await SharedPreferences.getInstance();
+  }
+
+  // Language Selected Flag
+  static Future<void> setLanguageSelected(bool val) async {
+    await init();
+    await _prefs!.setBool(_keyLanguageSelected, val);
+  }
+
+  static bool hasSelectedLanguage() {
+    return _prefs?.getBool(_keyLanguageSelected) ?? false;
   }
 
   // Token Management
@@ -57,6 +66,7 @@ class StorageService {
   static Future<void> saveLocale(String locale) async {
     await init();
     await _prefs!.setString(_keyLocale, locale);
+    await setLanguageSelected(true);
   }
 
   static String getLocale() {

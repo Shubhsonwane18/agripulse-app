@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../constants/supported_languages.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../auth/login_view.dart';
+import '../language/language_selection_view.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -13,6 +15,7 @@ class ProfileView extends StatelessWidget {
     final authVm = context.watch<AuthViewModel>();
     final user = authVm.currentUser;
     final loc = authVm.locale;
+    final currentLang = SupportedLanguages.findByCode(loc);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -64,7 +67,7 @@ class ProfileView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '📍 ${user?.village ?? "शिरोळ"}, ${user?.district ?? "कोल्हापूर"} • ${user?.landSizeAcres ?? 4.5} एकर',
+                      '📍 ,  •  एकर',
                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
                     ),
                   ),
@@ -105,7 +108,7 @@ class ProfileView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Language Selector Card
+            // Language Selector Card (All 11 Indian Languages)
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -116,18 +119,107 @@ class ProfileView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    AppStrings.get('language', locale: loc),
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildLangChoice(authVm, 'mr', 'मराठी'),
-                      const SizedBox(width: 8),
-                      _buildLangChoice(authVm, 'hi', 'हिंदी'),
-                      const SizedBox(width: 8),
-                      _buildLangChoice(authVm, 'en', 'English'),
+                      Row(
+                        children: [
+                          const Icon(Icons.translate_rounded, color: AppColors.primary, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            AppStrings.get('language', locale: loc),
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      TextButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LanguageSelectionView(isFirstTime: false),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.primary),
+                        label: const Text(
+                          'सर्व भाषा (All)',
+                          style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Currently active language banner
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LanguageSelectionView(isFirstTime: false),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F5E9),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.primary),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(currentLang.icon, style: const TextStyle(fontSize: 22)),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  ' ()',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                Text(
+                                  currentLang.region,
+                                  style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text(
+                              'सक्रिय / Active',
+                              style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+                  // Quick switch buttons for top languages
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildQuickLangPill(context, authVm, 'mr', 'मराठी'),
+                      _buildQuickLangPill(context, authVm, 'hi', 'हिन्दी'),
+                      _buildQuickLangPill(context, authVm, 'te', 'తెలుగు'),
+                      _buildQuickLangPill(context, authVm, 'kn', 'ಕನ್ನಡ'),
+                      _buildQuickLangPill(context, authVm, 'gu', 'ગુજરાતી'),
+                      _buildQuickLangPill(context, authVm, 'en', 'English'),
                     ],
                   ),
                 ],
@@ -139,11 +231,13 @@ class ProfileView extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: () async {
                 await authVm.signOut();
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginView()),
-                  (route) => false,
-                );
+                if (context.mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginView()),
+                    (route) => false,
+                  );
+                }
               },
               icon: const Icon(Icons.logout, color: Colors.red),
               label: Text(
@@ -162,26 +256,26 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  Widget _buildLangChoice(AuthViewModel vm, String code, String label) {
+  Widget _buildQuickLangPill(BuildContext context, AuthViewModel vm, String code, String label) {
     final isSel = vm.locale == code;
-    return Expanded(
-      child: InkWell(
-        onTap: () => vm.setLocale(code),
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: isSel ? AppColors.primary : AppColors.surfaceVariant,
-            borderRadius: BorderRadius.circular(10),
+    return InkWell(
+      onTap: () => vm.setLocale(code),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSel ? AppColors.primary : AppColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSel ? AppColors.primary : AppColors.cardBorder,
           ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: isSel ? Colors.white : AppColors.textPrimary,
-            ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: isSel ? Colors.white : AppColors.textPrimary,
           ),
         ),
       ),

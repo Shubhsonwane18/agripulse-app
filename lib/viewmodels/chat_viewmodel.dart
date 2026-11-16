@@ -1,5 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:record/record.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../models/chat_model.dart';
 import '../services/api_service.dart';
@@ -7,13 +6,11 @@ import '../services/api_service.dart';
 class ChatViewModel extends ChangeNotifier {
   final ApiService _apiService;
   final AudioPlayer _audioPlayer = AudioPlayer();
-  final AudioRecorder _audioRecorder = AudioRecorder();
 
   final List<ChatMessage> _messages = [];
   bool _isSending = false;
   bool _isRecording = false;
   bool _isPlaying = false;
-  String? _recordingPath;
 
   ChatViewModel({ApiService? apiService})
       : _apiService = apiService ?? ApiService() {
@@ -85,17 +82,12 @@ class ChatViewModel extends ChangeNotifier {
     }
   }
 
-  // Voice recording
+  // Voice recording simulation
   Future<void> startRecording() async {
     try {
-      if (await _audioRecorder.hasPermission()) {
-        _isRecording = true;
-        notifyListeners();
-        // Record voice note
-        await _audioRecorder.start(const RecordConfig(), path: '');
-      }
+      _isRecording = true;
+      notifyListeners();
     } catch (e) {
-      print('[ChatViewModel] startRecording error: $e');
       _isRecording = false;
       notifyListeners();
     }
@@ -103,16 +95,10 @@ class ChatViewModel extends ChangeNotifier {
 
   Future<void> stopRecordingAndSend(String locale) async {
     try {
-      final path = await _audioRecorder.stop();
       _isRecording = false;
       notifyListeners();
-
-      if (path != null) {
-        _recordingPath = path;
-        // In full app, send voice audio to /stt or directly to /chat
-        // For demonstration, send voice transcribed query
-        await sendMessage('आजचा कोल्हापूर व सांगली सोयाबीन बाजारभाव काय आहे?', locale);
-      }
+      // Send voice transcribed query
+      await sendMessage('आजचा कोल्हापूर व सांगली सोयाबीन बाजारभाव काय आहे?', locale);
     } catch (e) {
       _isRecording = false;
       notifyListeners();
@@ -137,7 +123,6 @@ class ChatViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _audioPlayer.dispose();
-    _audioRecorder.dispose();
     super.dispose();
   }
 }

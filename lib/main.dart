@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'constants/app_colors.dart';
@@ -14,6 +14,7 @@ import 'viewmodels/soil_viewmodel.dart';
 import 'viewmodels/store_viewmodel.dart';
 import 'views/main_nav_scaffold.dart';
 import 'views/auth/login_view.dart';
+import 'views/language/language_selection_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,6 +58,16 @@ class AgriPulseApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final authVm = context.watch<AuthViewModel>();
 
+    // Show language selection first if farmer hasn't selected language yet
+    Widget homeWidget;
+    if (!authVm.hasSelectedLanguage) {
+      homeWidget = const LanguageSelectionView(isFirstTime: true);
+    } else if (authVm.isAuthenticated) {
+      homeWidget = const MainNavScaffold();
+    } else {
+      homeWidget = const LoginView();
+    }
+
     return MaterialApp(
       title: 'AgriPulse (किसानमित्र)',
       debugShowCheckedModeBanner: false,
@@ -90,7 +101,7 @@ class AgriPulseApp extends StatelessWidget {
           ),
         ),
       ),
-      home: authVm.isAuthenticated ? const MainNavScaffold() : const LoginView(),
+      home: homeWidget,
     );
   }
 }

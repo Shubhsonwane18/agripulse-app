@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -7,6 +7,8 @@ import '../../viewmodels/weather_viewmodel.dart';
 import '../../viewmodels/mandi_viewmodel.dart';
 import '../soil/soil_advisory_view.dart';
 import '../store/store_view.dart';
+import '../../constants/supported_languages.dart';
+import '../language/language_selection_view.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -38,40 +40,45 @@ class HomeView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Text(
-                'किसानमित्र',
+                'à¤•à¤¿à¤¸à¤¾à¤¨à¤®à¤¿à¤¤à¥à¤°',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
               ),
             ),
           ],
         ),
         actions: [
-          // Language switcher
-          PopupMenuButton<String>(
-            initialValue: authVm.locale,
-            icon: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const LanguageSelectionView(isFirstTime: false),
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.18),
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.language, color: Colors.white, size: 14),
+                  const Icon(Icons.language_rounded, color: Colors.white, size: 14),
                   const SizedBox(width: 4),
                   Text(
-                    authVm.isMr ? 'मराठी' : (authVm.isHi ? 'हिंदी' : 'EN'),
+                    SupportedLanguages.findByCode(loc).nativeName,
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
                   ),
+                  const SizedBox(width: 2),
+                  const Icon(Icons.arrow_drop_down, color: Colors.white, size: 16),
                 ],
               ),
             ),
-            onSelected: (l) => authVm.setLocale(l),
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'mr', child: Text('मराठी (Marathi)')),
-              PopupMenuItem(value: 'hi', child: Text('हिंदी (Hindi)')),
-              PopupMenuItem(value: 'en', child: Text('English')),
-            ],
           ),
           const SizedBox(width: 8),
         ],
@@ -100,7 +107,7 @@ class HomeView extends StatelessWidget {
 
               // 4. Quick Action Grid
               Text(
-                authVm.isMr ? 'शेती निर्णय साधने' : (authVm.isHi ? 'कृषि निर्णय उपकरण' : 'Agronomic Tools'),
+                authVm.isMr ? 'à¤¶à¥‡à¤¤à¥€ à¤¨à¤¿à¤°à¥à¤£à¤¯ à¤¸à¤¾à¤§à¤¨à¥‡' : (authVm.isHi ? 'à¤•à¥ƒà¤·à¤¿ à¤¨à¤¿à¤°à¥à¤£à¤¯ à¤‰à¤ªà¤•à¤°à¤£' : 'Agronomic Tools'),
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
@@ -122,8 +129,8 @@ class HomeView extends StatelessWidget {
 
   Widget _buildFarmerHeaderCard(BuildContext context, AuthViewModel authVm) {
     final user = authVm.currentUser;
-    final name = user?.fullName ?? 'Ramesh Patil (शेतकरी)';
-    final location = '${user?.village ?? "शिरोळ"}, ${user?.district ?? "कोल्हापूर"}';
+    final name = user?.fullName ?? 'Ramesh Patil (à¤¶à¥‡à¤¤à¤•à¤°à¥€)';
+    final location = '${user?.village ?? "à¤¶à¤¿à¤°à¥‹à¤³"}, ${user?.district ?? "à¤•à¥‹à¤²à¥à¤¹à¤¾à¤ªà¥‚à¤°"}';
     final acreage = user?.landSizeAcres ?? 4.5;
 
     return Container(
@@ -167,7 +174,7 @@ class HomeView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          authVm.isMr ? 'डेमो' : 'DEMO',
+                          authVm.isMr ? 'à¤¡à¥‡à¤®à¥‹' : 'DEMO',
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
@@ -180,7 +187,7 @@ class HomeView extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '📍 $location • $acreage एकर शेत',
+                  'ðŸ“ $location â€¢ $acreage à¤à¤•à¤° à¤¶à¥‡à¤¤',
                   style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 ),
               ],
@@ -287,7 +294,7 @@ class HomeView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '🌾 ${mandiVm.selectedCommodity} — ' + AppStrings.get('bestMandi', locale: loc),
+                'ðŸŒ¾ ${mandiVm.selectedCommodity} â€” ' + AppStrings.get('bestMandi', locale: loc),
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
@@ -303,7 +310,7 @@ class HomeView extends StatelessWidget {
                     border: Border.all(color: AppColors.accent),
                   ),
                   child: Text(
-                    '+₹${delta.toStringAsFixed(0)} नफा',
+                    '+â‚¹${delta.toStringAsFixed(0)} à¤¨à¤«à¤¾',
                     style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -330,7 +337,7 @@ class HomeView extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${best.distanceKm} km अंतर • ${best.yardTier ?? "APMC Yard"}',
+                      '${best.distanceKm} km à¤…à¤‚à¤¤à¤° â€¢ ${best.yardTier ?? "APMC Yard"}',
                       style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                     ),
                   ],
@@ -339,7 +346,7 @@ class HomeView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '₹${best.effectiveNetRate.toStringAsFixed(0)} / Qtl',
+                      'â‚¹${best.effectiveNetRate.toStringAsFixed(0)} / Qtl',
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w900,
@@ -347,7 +354,7 @@ class HomeView extends StatelessWidget {
                       ),
                     ),
                     const Text(
-                      'हातात पडणारा निव्वळ दर',
+                      'à¤¹à¤¾à¤¤à¤¾à¤¤ à¤ªà¤¡à¤£à¤¾à¤°à¤¾ à¤¨à¤¿à¤µà¥à¤µà¤³ à¤¦à¤°',
                       style: TextStyle(fontSize: 9, color: AppColors.textMuted),
                     ),
                   ],
@@ -373,8 +380,8 @@ class HomeView extends StatelessWidget {
           context,
           icon: Icons.science_outlined,
           color: Colors.teal,
-          title: authVm.isMr ? 'माती परीक्षण सल्ला' : 'Soil Health & NPK',
-          subtitle: authVm.isMr ? 'ICAR खत मात्रा' : 'Fertilizer Dosage',
+          title: authVm.isMr ? 'à¤®à¤¾à¤¤à¥€ à¤ªà¤°à¥€à¤•à¥à¤·à¤£ à¤¸à¤²à¥à¤²à¤¾' : 'Soil Health & NPK',
+          subtitle: authVm.isMr ? 'ICAR à¤–à¤¤ à¤®à¤¾à¤¤à¥à¤°à¤¾' : 'Fertilizer Dosage',
           onTap: () {
             Navigator.push(
               context,
@@ -386,8 +393,8 @@ class HomeView extends StatelessWidget {
           context,
           icon: Icons.shopping_bag_outlined,
           color: Colors.indigo,
-          title: authVm.isMr ? 'कृषी इनपुट स्टोर' : 'Agri Store',
-          subtitle: authVm.isMr ? 'खते, बियाणे, औषधे' : 'Direct Seeds & DAP',
+          title: authVm.isMr ? 'à¤•à¥ƒà¤·à¥€ à¤‡à¤¨à¤ªà¥à¤Ÿ à¤¸à¥à¤Ÿà¥‹à¤°' : 'Agri Store',
+          subtitle: authVm.isMr ? 'à¤–à¤¤à¥‡, à¤¬à¤¿à¤¯à¤¾à¤£à¥‡, à¤”à¤·à¤§à¥‡' : 'Direct Seeds & DAP',
           onTap: () {
             Navigator.push(
               context,
@@ -457,7 +464,7 @@ class HomeView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              '📊 आजचे प्रमुख बाजारभाव (APMC Live)',
+              'ðŸ“Š à¤†à¤œà¤šà¥‡ à¤ªà¥à¤°à¤®à¥à¤– à¤¬à¤¾à¤œà¤¾à¤°à¤­à¤¾à¤µ (APMC Live)',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w800,
@@ -466,7 +473,7 @@ class HomeView extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {},
-              child: const Text('सर्व पहा →', style: TextStyle(fontSize: 12, color: AppColors.primary)),
+              child: const Text('à¤¸à¤°à¥à¤µ à¤ªà¤¹à¤¾ â†’', style: TextStyle(fontSize: 12, color: AppColors.primary)),
             ),
           ],
         ),
@@ -490,13 +497,13 @@ class HomeView extends StatelessWidget {
                         style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        '${eval.distanceKm} km • खर्च: -₹${eval.logisticsOverhead.toStringAsFixed(0)}',
+                        '${eval.distanceKm} km â€¢ à¤–à¤°à¥à¤š: -â‚¹${eval.logisticsOverhead.toStringAsFixed(0)}',
                         style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
                       ),
                     ],
                   ),
                   Text(
-                    '₹${eval.quotedGrossRate.toStringAsFixed(0)}',
+                    'â‚¹${eval.quotedGrossRate.toStringAsFixed(0)}',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
@@ -510,3 +517,4 @@ class HomeView extends StatelessWidget {
     );
   }
 }
+

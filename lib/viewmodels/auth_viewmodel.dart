@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
@@ -8,6 +8,7 @@ class AuthViewModel extends ChangeNotifier {
   UserProfile? _currentUser;
   bool _isLoading = false;
   String _locale = 'mr'; // Default Marathi for regional farmers
+  bool _hasSelectedLanguage = false;
   String? _errorMessage;
 
   AuthViewModel({AuthService? authService})
@@ -19,6 +20,7 @@ class AuthViewModel extends ChangeNotifier {
   bool get isAuthenticated => _currentUser != null;
   bool get isLoading => _isLoading;
   String get locale => _locale;
+  bool get hasSelectedLanguage => _hasSelectedLanguage;
   String? get errorMessage => _errorMessage;
 
   bool get isEn => _locale == 'en';
@@ -27,6 +29,7 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<void> _init() async {
     _locale = StorageService.getLocale();
+    _hasSelectedLanguage = StorageService.hasSelectedLanguage();
     _currentUser = StorageService.getProfile();
     notifyListeners();
 
@@ -41,9 +44,15 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  // Set Language (En / Mr / Hi) and sync
+  // Confirm language selection
+  Future<void> confirmLanguageSelected() async {
+    _hasSelectedLanguage = true;
+    await StorageService.setLanguageSelected(true);
+    notifyListeners();
+  }
+
+  // Set Language (En / Mr / Hi / Te / Kn / Ta / Gu / Pa / Bn / Or / Ml) and sync
   Future<void> setLocale(String newLocale) async {
-    if (_locale == newLocale) return;
     _locale = newLocale;
     await StorageService.saveLocale(newLocale);
 

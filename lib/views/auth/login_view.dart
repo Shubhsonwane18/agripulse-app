@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../constants/supported_languages.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../main_nav_scaffold.dart';
+import '../language/language_selection_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -39,17 +41,69 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     final authVm = context.watch<AuthViewModel>();
     final loc = authVm.locale;
+    final currentLang = SupportedLanguages.findByCode(loc);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Brand Header
+                // Top Language Switcher Bar
+                Align(
+                  alignment: Alignment.topRight,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LanguageSelectionView(isFirstTime: false),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.3),
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x0A000000),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.language_rounded, color: AppColors.primary, size: 16),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${currentLang.nativeName} (${currentLang.englishName})',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary, size: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Brand Emblem
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -78,9 +132,9 @@ class _LoginViewState extends State<LoginView> {
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text(
-                        'किसानमित्र',
-                        style: TextStyle(
+                      child: Text(
+                        AppStrings.get('appHindiName', locale: loc),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -115,7 +169,7 @@ class _LoginViewState extends State<LoginView> {
                   child: ElevatedButton(
                     onPressed: () async {
                       await authVm.loginAsDemo();
-                      _onSuccess(context);
+                      if (context.mounted) _onSuccess(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
@@ -125,105 +179,117 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     child: Column(
                       children: [
-                        Text(
-                          AppStrings.get('demoLogin', locale: loc),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.bolt, color: Colors.amber, size: 20),
+                            const SizedBox(width: 6),
+                            Text(
+                              AppStrings.get('demoLogin', locale: loc),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 2),
                         Text(
                           AppStrings.get('demoSub', locale: loc),
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
-                            fontSize: 10,
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontSize: 11,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
 
-                // Or Divider
+                const SizedBox(height: 18),
                 Row(
                   children: [
                     const Expanded(child: Divider()),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
-                        authVm.isMr ? 'किंवा ईमेलने सुरू ठेवा' : 'Or continue with email',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                        AppStrings.get('signIn', locale: loc),
+                        style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
                       ),
                     ),
                     const Expanded(child: Divider()),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 18),
 
-                // Form Container
+                // Auth Card (Sign In / Sign Up)
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppColors.cardBorder),
+                    boxShadow: const [
+                      BoxShadow(color: Color(0x06000000), blurRadius: 10, offset: Offset(0, 4)),
+                    ],
                   ),
                   child: Column(
                     children: [
-                      // Mode Selector Tabs (Sign In / Sign Up)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: InkWell(
-                              onTap: () => setState(() => _isSignUp = false),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: !_isSignUp ? AppColors.primary : Colors.transparent,
-                                      width: 2,
-                                    ),
+                      // Toggle Tabs
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => setState(() => _isSignUp = false),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: !_isSignUp ? AppColors.primary : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                ),
-                                child: Text(
-                                  AppStrings.get('signIn', locale: loc),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: !_isSignUp ? AppColors.primary : AppColors.textMuted,
+                                  child: Center(
+                                    child: Text(
+                                      AppStrings.get('signIn', locale: loc),
+                                      style: TextStyle(
+                                        color: !_isSignUp ? Colors.white : AppColors.textSecondary,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () => setState(() => _isSignUp = true),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: _isSignUp ? AppColors.primary : Colors.transparent,
-                                      width: 2,
-                                    ),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => setState(() => _isSignUp = true),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: _isSignUp ? AppColors.primary : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                ),
-                                child: Text(
-                                  AppStrings.get('signUp', locale: loc),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: _isSignUp ? AppColors.primary : AppColors.textMuted,
+                                  child: Center(
+                                    child: Text(
+                                      AppStrings.get('signUp', locale: loc),
+                                      style: TextStyle(
+                                        color: _isSignUp ? Colors.white : AppColors.textSecondary,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -301,10 +367,10 @@ class _LoginViewState extends State<LoginView> {
                                     fullName: name.isNotEmpty ? name : 'शेतकरी',
                                     phone: phone,
                                   );
-                                  if (ok) _onSuccess(context);
+                                  if (ok && context.mounted) _onSuccess(context);
                                 } else {
                                   final ok = await authVm.signIn(email, pass);
-                                  if (ok) _onSuccess(context);
+                                  if (ok && context.mounted) _onSuccess(context);
                                 }
                               },
                         style: ElevatedButton.styleFrom(
@@ -337,9 +403,7 @@ class _LoginViewState extends State<LoginView> {
                     const Icon(Icons.verified_user_outlined, size: 14, color: AppColors.textMuted),
                     const SizedBox(width: 4),
                     Text(
-                      authVm.isMr
-                          ? 'वेब आणि ॲपमध्ये एकाच खात्यावरून संपूर्ण डेटा थेट सिंक'
-                          : '100% Unified Cloud Sync with AgriPulse Web App',
+                      AppStrings.get('syncNotice', locale: loc),
                       style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
                     ),
                   ],

@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
+import '../constants/app_strings.dart';
+import '../constants/supported_languages.dart';
 import '../viewmodels/auth_viewmodel.dart';
+import '../views/language/language_selection_view.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -21,6 +24,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final authVm = context.watch<AuthViewModel>();
+    final loc = authVm.locale;
+    final currentLang = SupportedLanguages.findByCode(loc);
 
     return AppBar(
       backgroundColor: AppColors.primary,
@@ -45,12 +50,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text(
-                  'किसानमित्र',
-                  style: TextStyle(
+                child: Text(
+                  AppStrings.get('appHindiName', locale: loc),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
@@ -63,45 +68,50 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             Text(
               subtitle!,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 11,
               ),
             ),
         ],
       ),
       actions: [
-        // Language Selector Chip
-        PopupMenuButton<String>(
-          initialValue: authVm.locale,
-          icon: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        // Language Selector Chip -> Opens full Indian languages selection sheet/view
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const LanguageSelectionView(isFirstTime: false),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.18),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.3)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.language, color: Colors.white, size: 14),
+                const Icon(Icons.language_rounded, color: Colors.white, size: 14),
                 const SizedBox(width: 4),
                 Text(
-                  authVm.isMr ? 'मराठी' : (authVm.isHi ? 'हिंदी' : 'EN'),
+                  currentLang.nativeName,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 11,
+                    fontSize: 12,
                   ),
                 ),
+                const SizedBox(width: 2),
+                const Icon(Icons.arrow_drop_down, color: Colors.white, size: 16),
               ],
             ),
           ),
-          onSelected: (loc) => authVm.setLocale(loc),
-          itemBuilder: (context) => [
-            const PopupMenuItem(value: 'mr', child: Text('मराठी (Marathi)')),
-            const PopupMenuItem(value: 'hi', child: Text('हिंदी (Hindi)')),
-            const PopupMenuItem(value: 'en', child: Text('English')),
-          ],
         ),
         if (actions != null) ...actions!,
         const SizedBox(width: 8),
