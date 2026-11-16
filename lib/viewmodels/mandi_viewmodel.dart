@@ -100,7 +100,28 @@ class MandiViewModel extends ChangeNotifier {
           MandiCandidate(id: 'narayangaon-pune', name: 'Narayangaon Tomato Yard', distanceKm: 70.0, modalPricePerQtl: 2150.0, district: 'Pune'),
           MandiCandidate(id: 'sangamner-ahmednagar', name: 'Sangamner APMC', distanceKm: 45.0, modalPricePerQtl: 1980.0, district: 'Ahmednagar'),
           MandiCandidate(id: 'pimpalgaon-nashik', name: 'Pimpalgaon Baswant APMC', distanceKm: 65.0, modalPricePerQtl: 2240.0, district: 'Nashik'),
-          MandiCandidate(id: 'kolhapur-market', name: 'Kolhapur Shahu Market Yard', distanceKm: 120.0, modalPricePerQtl: 2300.0, district: 'Kolhapur'),
+          MandiCandidate(id: 'kolhapur-market', name: 'Kolhapur Shahu Market Yard', distanceKm: 22.0, modalPricePerQtl: 2120.0, district: 'Kolhapur'),
+        ];
+      case 'Cotton':
+        return [
+          MandiCandidate(id: 'jalna-cotton', name: 'Jalna Cotton Market Yard', distanceKm: 105.0, modalPricePerQtl: 7250.0, district: 'Jalna'),
+          MandiCandidate(id: 'hinganghat-apmc', name: 'Hinganghat APMC Yard', distanceKm: 140.0, modalPricePerQtl: 7480.0, district: 'Wardha'),
+          MandiCandidate(id: 'yavatmal-cotton', name: 'Yavatmal APMC Mandi', distanceKm: 95.0, modalPricePerQtl: 7180.0, district: 'Yavatmal'),
+          MandiCandidate(id: 'akola-cotton', name: 'Akola Cotton Market Yard', distanceKm: 75.0, modalPricePerQtl: 7320.0, district: 'Akola'),
+        ];
+      case 'Tur':
+        return [
+          MandiCandidate(id: 'latur-tur', name: 'Latur APMC Pulses Yard', distanceKm: 70.0, modalPricePerQtl: 9850.0, district: 'Latur'),
+          MandiCandidate(id: 'akola-tur', name: 'Akola Dal & Pulses Mandi', distanceKm: 85.0, modalPricePerQtl: 9620.0, district: 'Akola'),
+          MandiCandidate(id: 'solapur-tur', name: 'Solapur APMC Yard', distanceKm: 55.0, modalPricePerQtl: 9450.0, district: 'Solapur'),
+          MandiCandidate(id: 'gulbarga-tur', name: 'Kalaburagi / Gulbarga APMC', distanceKm: 110.0, modalPricePerQtl: 10120.0, district: 'Kalaburagi'),
+        ];
+      case 'Wheat':
+        return [
+          MandiCandidate(id: 'pune-wheat', name: 'Pune Gultekdi APMC Yard', distanceKm: 60.0, modalPricePerQtl: 2850.0, district: 'Pune'),
+          MandiCandidate(id: 'kolhapur-wheat', name: 'Kolhapur Shahu Market', distanceKm: 25.0, modalPricePerQtl: 2740.0, district: 'Kolhapur'),
+          MandiCandidate(id: 'sangli-wheat', name: 'Sangli APMC Market Yard', distanceKm: 38.0, modalPricePerQtl: 2780.0, district: 'Sangli'),
+          MandiCandidate(id: 'solapur-wheat', name: 'Solapur Market Yard', distanceKm: 90.0, modalPricePerQtl: 2920.0, district: 'Solapur'),
         ];
       case 'Soybean':
       default:

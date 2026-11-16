@@ -83,6 +83,38 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
+  // Phone + OTP Sign In (Accepts 10-digit mobile number & dummy OTP e.g. 123456)
+  Future<bool> loginWithPhoneOtp({
+    required String phone,
+    required String otp,
+    String? customName,
+  }) async {
+    _setLoading(true);
+    _errorMessage = null;
+    try {
+      final cleanPhone = phone.replaceAll(RegExp(r'\D'), '');
+      if (cleanPhone.length < 10) {
+        _errorMessage = 'कृपया १०-अंकी मोबाईल नंबर टाका.';
+        _setLoading(false);
+        return false;
+      }
+      final displayName = (customName != null && customName.trim().isNotEmpty)
+          ? customName.trim()
+          : 'शेतकरी ($cleanPhone)';
+      final profile = await _authService.loginAsDemo(
+        customName: displayName,
+        customPhone: cleanPhone,
+      );
+      _currentUser = profile;
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _setLoading(false);
+      return false;
+    }
+  }
+
   // Email / Password Sign In
   Future<bool> signIn(String email, String password) async {
     _setLoading(true);
