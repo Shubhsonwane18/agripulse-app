@@ -67,7 +67,7 @@ class ProfileView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '📍 ,  •  एकर',
+                      '📍 ${user?.village ?? "शिरोळ"}, ${user?.district ?? "कोल्हापूर"} • ${user?.landSizeAcres ?? 4.5} एकर',
                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
                     ),
                   ),
@@ -178,7 +178,7 @@ class ProfileView extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  ' ()',
+                                  '${currentLang.nativeName} (${currentLang.englishName})',
                                   style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w900,

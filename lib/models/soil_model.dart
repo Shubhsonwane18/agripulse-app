@@ -1,4 +1,4 @@
-﻿class SoilTestInput {
+class SoilTestInput {
   final double nitrogen; // kg/ha
   final double phosphorus; // kg/ha
   final double potassium; // kg/ha

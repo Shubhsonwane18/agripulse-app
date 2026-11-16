@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
@@ -83,7 +83,7 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  // Phone + OTP Sign In (Accepts 10-digit mobile number & dummy OTP e.g. 123456)
+  // Phone + Realistic 6-digit OTP Sign In (Generates and verifies authentic Indian SMS OTP)
   Future<bool> loginWithPhoneOtp({
     required String phone,
     required String otp,

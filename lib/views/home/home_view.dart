@@ -366,7 +366,14 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white, size: 19),
+            tooltip: 'Sign Out (लॉगआउट)',
+            onPressed: () async {
+              await authVm.signOut();
+            },
+          ),
+          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(

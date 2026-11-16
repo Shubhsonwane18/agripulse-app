@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
@@ -24,6 +25,7 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _otpController = TextEditingController();
   bool _otpAutoFilled = false;
   bool _otpTriggered = false;
+  String _generatedOtp = '784920';
 
   // Email / Password controllers
   final TextEditingController _emailController = TextEditingController();
@@ -34,14 +36,70 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
+    _refreshRealisticOtp();
     _phoneOtpController.addListener(() {
       final text = _phoneOtpController.text.trim();
       if (text.length >= 10 && !_otpTriggered) {
-        setState(() {
-          _otpTriggered = true;
-        });
+        _triggerOtpSent();
       }
     });
+  }
+
+  void _refreshRealisticOtp() {
+    final rand = Random();
+    // Realistic 6-digit OTP, e.g. 784920, 849261, 638192
+    final first = 4 + rand.nextInt(5); // 4-8
+    final rest = rand.nextInt(90000) + 10000;
+    _generatedOtp = '$first$rest';
+  }
+
+  void _triggerOtpSent() {
+    _refreshRealisticOtp();
+    setState(() {
+      _otpTriggered = true;
+      _otpAutoFilled = false;
+      _otpController.clear();
+    });
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: const Color(0xFF1E293B),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        margin: const EdgeInsets.only(top: 10, left: 16, right: 16, bottom: 20),
+        duration: const Duration(seconds: 4),
+        content: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade800,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.sms_rounded, color: Colors.white, size: 18),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'संदेश (SMS) • JM-AGRIPULSE',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.white70),
+                  ),
+                  Text(
+                    'AgriPulse पडताळणी कोड: $_generatedOtp (१० मिनिटे वैध). कोणाशीही शेअर करू नका.',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -64,20 +122,20 @@ class _LoginViewState extends State<LoginView> {
 
   void _autofillDummyOtp() {
     setState(() {
-      _otpController.text = '123456';
+      _otpController.text = _generatedOtp;
       _otpAutoFilled = true;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.white, size: 20),
-            SizedBox(width: 8),
-            Text('डमी OTP 123456 भरला आहे!'),
+            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Text('SMS OTP $_generatedOtp भरला आहे!'),
           ],
         ),
         backgroundColor: AppColors.primary,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -94,9 +152,9 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    // If OTP is empty, default fill with 123456 for instant convenience
+    // If OTP is empty, fill with current generated OTP
     if (_otpController.text.trim().isEmpty) {
-      _otpController.text = '123456';
+      _otpController.text = _generatedOtp;
       _otpAutoFilled = true;
     }
 
@@ -497,7 +555,7 @@ class _LoginViewState extends State<LoginView> {
                                 ),
                                 const SizedBox(height: 10),
 
-                                // Prominent "Autofill Dummy OTP (123456)" Button
+                                // Prominent "Autofill OTP" Button
                                 SizedBox(
                                   width: double.infinity,
                                   child: OutlinedButton.icon(
@@ -505,8 +563,8 @@ class _LoginViewState extends State<LoginView> {
                                     icon: const Icon(Icons.bolt, color: Colors.amber, size: 18),
                                     label: Text(
                                       authVm.isMr
-                                          ? '⚡ ऑटो-फिल डमी OTP (123456)'
-                                          : (authVm.isHi ? '⚡ ऑटो-फिल डमी OTP (123456)' : '⚡ Autofill Dummy OTP (123456)'),
+                                          ? '⚡ ऑटो-फिल SMS OTP ($_generatedOtp)'
+                                          : (authVm.isHi ? '⚡ ऑटो-फिल SMS OTP ($_generatedOtp)' : '⚡ Autofill SMS OTP ($_generatedOtp)'),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
@@ -593,7 +651,7 @@ class _LoginViewState extends State<LoginView> {
                                   ),
                                 );
                               } else {
-                                setState(() => _otpTriggered = true);
+                                _triggerOtpSent();
                               }
                             },
                             style: ElevatedButton.styleFrom(
