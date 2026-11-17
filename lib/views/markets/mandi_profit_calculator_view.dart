@@ -334,24 +334,31 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.account_balance_rounded, color: AppColors.primary, size: 20),
-                          const SizedBox(width: 6),
-                          Text(
-                            AppStrings.tr(
-                              loc,
-                              en: 'Step 1: Select Your State',
-                              mr: 'पायरी १: आपले राज्य निवडा (Select State)',
-                              hi: 'चरण १: अपना राज्य चुनें (Select State)',
-                              te: 'దశ 1: మీ రాష్ట్రాన్ని ఎంచుకోండి (State)',
-                              kn: 'ಹಂತ 1: ನಿಮ್ಮ ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ (State)',
-                              gu: 'પગલું 1: તમારું રાજ્ય પસંદ કરો (State)',
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.account_balance_rounded, color: AppColors.primary, size: 20),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                AppStrings.tr(
+                                  loc,
+                                  en: 'Step 1: Select Your State',
+                                  mr: 'पायरी १: आपले राज्य निवडा (State)',
+                                  hi: 'चरण १: अपना राज्य चुनें (State)',
+                                  te: 'దశ 1: మీ రాష్ట్రాన్ని ఎంచుకోండి (State)',
+                                  kn: 'ಹಂತ 1: ನಿಮ್ಮ ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ (State)',
+                                  gu: 'પગલું 1: તમારું રાજ્ય પસંદ કરો (State)',
+                                ),
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
@@ -423,24 +430,31 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 20),
-                          const SizedBox(width: 6),
-                          Text(
-                            AppStrings.tr(
-                              loc,
-                              en: 'Step 2: Select City / District',
-                              mr: 'पायरी २: आपले शहर / जिल्हा निवडा (City)',
-                              hi: 'चरण २: अपना शहर / जिला चुनें (City)',
-                              te: 'దశ 2: మీ నగరం / జిల్లాను ఎంచుకోండి (City)',
-                              kn: 'ಹಂತ 2: ನಿಮ್ಮ ನಗರ / ಜಿಲ್ಲೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ (City)',
-                              gu: 'પગલું 2: તમારું શહેર / જિલ્લો પસંદ કરો (City)',
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 20),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                AppStrings.tr(
+                                  loc,
+                                  en: 'Step 2: Select City / District',
+                                  mr: 'पायरी २: आपले शहर / जिल्हा निवडा (City)',
+                                  hi: 'चरण २: अपना शहर / जिला चुनें (City)',
+                                  te: 'దశ 2: మీ నగరం / జిల్లాను ఎంచుకోండి (City)',
+                                  kn: 'ಹಂತ 2: ನಿಮ್ಮ ನಗರ / ಜಿಲ್ಲೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ (City)',
+                                  gu: 'પગલું 2: તમારું શહેર / જિલ્લો પસંદ કરો (City)',
+                                ),
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
@@ -627,24 +641,31 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.scale_rounded, color: AppColors.primary, size: 20),
-                          const SizedBox(width: 6),
-                          Text(
-                            AppStrings.tr(
-                              loc,
-                              en: 'Step 4: Enter Harvest Quantity (Quintals)',
-                              mr: 'पायरी ४: शेतमालाचे वजन (Quantity)',
-                              hi: 'चरण ४: उपज की मात्रा (Quantity)',
-                              te: 'దశ 4: దిగుబడి పరిమాణం (క్వింటాళ్ళు)',
-                              kn: 'ಹಂತ 4: ಬೆಳೆ ತೂಕ (ಕ್ವಿಂಟಾಲ್)',
-                              gu: 'પગલું 4: ઉપજનું વજન (ક્વિન્ટલ)',
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.scale_rounded, color: AppColors.primary, size: 20),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                AppStrings.tr(
+                                  loc,
+                                  en: 'Step 4: Enter Harvest Quantity (Quintals)',
+                                  mr: 'पायरी ४: शेतमालाचे वजन (Quantity)',
+                                  hi: 'चरण ४: उपज की मात्रा (Quantity)',
+                                  te: 'దశ 4: దిగుబడి పరిమాణం (క్వింటాళ్ళు)',
+                                  kn: 'ಹಂತ 4: ಬೆಳೆ ತೂಕ (ಕ್ವಿಂಟಾಲ್)',
+                                  gu: 'પગલું 4: ઉપજનું વજન (ક્વિન્ટલ)',
+                                ),
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
@@ -826,17 +847,21 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
               children: [
                 const Icon(Icons.stars_rounded, color: Colors.amber, size: 22),
                 const SizedBox(width: 6),
-                Text(
-                  AppStrings.tr(
-                    loc,
-                    en: 'Step 5: Highest In-Hand Profit Mandi (Answer)',
-                    mr: 'पायरी ५: सर्वाधिक हातात उरणारा निव्वळ नफा (निकाल)',
-                    hi: 'चरण ५: सर्वाधिक शुद्ध लाभ देने वाली मंडी (उत्तर)',
-                    te: 'దశ 5: అత్యధిక నికర లాభం కలిగిన మార్కెట్ (సమాధానం)',
-                    kn: 'ಹಂತ 5: ಅತಿ ಹೆಚ್ಚು ನಿವ್ವಳ ಲಾಭದ ಮಾರುಕಟ್ಟೆ (ಉತ್ತರ)',
-                    gu: 'પગલું 5: સૌથી વધુ ચોખ્ખો નફો આપતી બજાર (જવાબ)',
+                Expanded(
+                  child: Text(
+                    AppStrings.tr(
+                      loc,
+                      en: 'Step 5: Highest In-Hand Profit Mandi (Answer)',
+                      mr: 'पायरी ५: सर्वाधिक हातात उरणारा निव्वळ नफा (निकाल)',
+                      hi: 'चरण ५: सर्वाधिक शुद्ध लाभ देने वाली मंडी (उत्तर)',
+                      te: 'దశ 5: అత్యధిక నికర లాభం కలిగిన మార్కెట్ (సమాధానం)',
+                      kn: 'ಹಂತ 5: ಅತಿ ಹೆಚ್ಚು ನಿವ್ವಳ ಲಾಭದ ಮಾರುಕಟ್ಟೆ (ಉತ್ತರ)',
+                      gu: 'પગલું 5: સૌથી વધુ ચોખ્ખો નફો આપતી બજાર (જવાબ)',
+                    ),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
                 ),
               ],
             ),

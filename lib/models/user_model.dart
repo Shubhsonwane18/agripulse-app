@@ -35,7 +35,7 @@ class UserProfile {
   factory UserProfile.defaultDemo() {
     return UserProfile(
       id: 'demo-farmer-id-789',
-      fullName: 'Ramesh Patil (शेतकरी)',
+      fullName: 'Ramesh Patil',
       phone: '+91 98220 12345',
       email: 'ramesh.patil@agripulse.demo',
       language: 'mr',

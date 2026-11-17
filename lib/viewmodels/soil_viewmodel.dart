@@ -11,7 +11,7 @@ class SoilViewModel extends ChangeNotifier {
 
   SoilViewModel() {
     calculateAdvisory();
-    detectFromCoordinates(lat: 16.71, lon: 74.59, district: 'कोल्हापूर', village: 'शिरोळ');
+    detectFromCoordinates(lat: 16.71, lon: 74.59, district: 'Kolhapur', village: 'Shirol');
     _updateForecast();
   }
 

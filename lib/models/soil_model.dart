@@ -231,11 +231,17 @@ class GeoSoilProfile {
     }
 
     // 3. Western Maharashtra / Krishna Valley (Kolhapur, Sangli, Satara, Pune, Shirol) -> Deep Black Cotton Soil (Regur)
+    final isKolhapur = dist.contains('kolhapur') || dist.contains('कोल्हापूर') || dist.isEmpty;
+    final villMr = (vill.toLowerCase() == 'shirol' || vill == 'शिरोळ') ? 'शिरोळ' : vill;
+    final villEn = (vill.toLowerCase() == 'shirol' || vill == 'शिरोळ') ? 'Shirol' : vill;
+    final distMr = isKolhapur ? 'कोल्हापूर' : district ?? 'कोल्हापूर';
+    final distEn = isKolhapur ? 'Kolhapur' : district ?? 'Kolhapur';
+
     return GeoSoilProfile(
       soilTypeName: 'काळी कसदार रेगूर माती (Deep Black Cotton Soil)',
       soilTypeEnglish: 'Deep Krishna Basin Vertisol (Regur Soil)',
-      locationTag: '$vill, ${dist.isNotEmpty ? dist : "कोल्हापूर"} (कृष्णा खोरे)',
-      locationTagEn: '$vill, ${dist.isNotEmpty ? dist : "Kolhapur"} (Krishna Valley)',
+      locationTag: '$villMr, $distMr (कृष्णा खोरे)',
+      locationTagEn: '$villEn, $distEn (Krishna Valley)',
       ph: 7.8,
       organicCarbon: '0.72% (उत्कृष्ट)',
       organicCarbonEn: '0.72% (Optimal High)',

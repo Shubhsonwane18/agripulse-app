@@ -326,9 +326,12 @@ class _HomeViewState extends State<HomeView> {
   // --- 1. FARMER HEADER CARD ---
   Widget _buildFarmerHeaderCard(BuildContext context, AuthViewModel authVm, String loc) {
     final user = authVm.currentUser;
-    final name = (user?.fullName != null && user!.fullName.isNotEmpty)
+    String rawName = (user?.fullName != null && user!.fullName.isNotEmpty)
         ? user.fullName
-        : AppStrings.tr(loc, en: 'Ramesh Patil (Farmer)', mr: 'रमेश पाटील (शेतकरी)', hi: 'रमेश पाटिल (किसान)', te: 'రమేష్ పాటిల్ (రైతు)', kn: 'ರಮೇಶ್ ಪಾಟೀಲ್ (ರೈತ)', gu: 'રમેશ પાટીલ (ખેડૂત)');
+        : AppStrings.tr(loc, en: 'Ramesh Patil', mr: 'रमेश पाटील', hi: 'रमेश पाटिल', te: 'రమేష్ పాటిల్', kn: 'ರಮೇಶ್ ಪಾಟೀಲ್', gu: 'રમેશ પાટીલ');
+    rawName = rawName.replaceAll('(शेतकरी)', '').replaceAll('(Farmer)', '').replaceAll('(किसान)', '').trim();
+    final name = rawName.isNotEmpty ? rawName : 'Ramesh Patil';
+
     final village = (user?.village != null && user!.village!.isNotEmpty)
         ? user.village!
         : AppStrings.tr(loc, en: 'Shirol', mr: 'शिरोळ', hi: 'शिरोल', te: 'శిరోల్', kn: 'ಶಿರೋಳ', gu: 'શિરોળ');
@@ -404,6 +407,8 @@ class _HomeViewState extends State<HomeView> {
                       Text(
                         '📍 $village, $district • $acreage ${AppStrings.get("acresFarmland", locale: loc)}',
                         style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -491,20 +496,27 @@ class _HomeViewState extends State<HomeView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 20),
-                  const SizedBox(width: 6),
-                  Text(
-                    AppStrings.get('nearbyMandisTitle', locale: loc),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textPrimary,
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 20),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        AppStrings.get('nearbyMandisTitle', locale: loc),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -570,43 +582,39 @@ class _HomeViewState extends State<HomeView> {
           // Highlight Highest Quoted Rate Mandi Banner
           if (highestMandi != null) ...[
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
               decoration: BoxDecoration(
-                color: Colors.amber.shade50,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.amber.shade300),
+                color: const Color(0xFFFEF3C7),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFFDE68A)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.trending_up, color: Colors.amber, size: 18),
-                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDE68A),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.trending_up_rounded, color: Color(0xFFB45309), size: 18),
+                  ),
+                  const SizedBox(width: 10),
                   Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        style: const TextStyle(fontSize: 11, color: Colors.brown),
-                        children: [
-                          TextSpan(
-                            text: AppStrings.tr(
-                              loc,
-                              en: 'Highest Price: ',
-                              mr: 'या पिकासाठी सर्वोच्च भाव: ',
-                              hi: 'सर्वोच्च भाव: ',
-                              te: 'అత్యధిక ధర: ',
-                              kn: 'ಅತ್ಯಧಿಕ ದರ: ',
-                              gu: 'સર્વોચ્ચ ભાવ: ',
-                            ),
-                          ),
-                          TextSpan(
-                            text: '${highestMandi.mandiName} ',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                            text: '₹${highestMandi.quotedGrossRate.toStringAsFixed(0)} / Qtl',
-                            style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.black87),
-                          ),
-                          TextSpan(text: ' (${highestMandi.distanceKm} km)'),
-                        ],
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${AppStrings.tr(loc, en: "Highest Price Mandi:", mr: "सर्वोच्च भाव बाजारपेठ:", hi: "सर्वोच्च भाव मंडी:", te: "అత్యధిక ధర మార్కెట్:", kn: "ಅತ್ಯಧಿಕ ದರ ಮಾರುಕಟ್ಟೆ:", gu: "સર્વોચ્ચ ભાવ બજાર:")} ${highestMandi.mandiName}',
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF92400E)),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '₹${highestMandi.quotedGrossRate.toStringAsFixed(0)} / Qtl • ${highestMandi.distanceKm} km',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Color(0xFF78350F)),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -785,7 +793,7 @@ class _HomeViewState extends State<HomeView> {
                         children: [
                           Row(
                             children: [
-                              Flexible(
+                              Expanded(
                                 child: Text(
                                   eval.mandiName,
                                   style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
@@ -794,9 +802,9 @@ class _HomeViewState extends State<HomeView> {
                                 ),
                               ),
                               if (isWinner) ...[
-                                const SizedBox(width: 4),
+                                const SizedBox(width: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                                   decoration: BoxDecoration(
                                     color: AppColors.primary,
                                     borderRadius: BorderRadius.circular(4),
@@ -811,19 +819,23 @@ class _HomeViewState extends State<HomeView> {
                                       kn: '🏆 ಗರಿಷ್ಠ ಲಾಭ',
                                       gu: '🏆 મહત્તમ નફો',
                                     ),
-                                    style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
                             ],
                           ),
+                          const SizedBox(height: 2),
                           Text(
                             '${eval.distanceKm} km • ${AppStrings.tr(loc, en: "Quoted Rate:", mr: "बाजार भाव:", hi: "मंडी भाव:", te: "మార్కెట్ రేటు:", kn: "ಮಾರುಕಟ್ಟೆ ದರ:", gu: "બજાર ભાવ:")} ₹${eval.quotedGrossRate.toStringAsFixed(0)}/Qtl',
                             style: const TextStyle(fontSize: 9, color: AppColors.textMuted),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -909,6 +921,8 @@ class _HomeViewState extends State<HomeView> {
           Text(
             '${AppStrings.tr(loc, en: "Location:", mr: "स्थान:", hi: "स्थान:", te: "ప్రాంతం:", kn: "ಸ್ಥಳ:", gu: "સ્થળ:")} ${soil.getLocation(!isMr)}',
             style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 10),
 
@@ -955,8 +969,10 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${AppStrings.tr(loc, en: "Organic Carbon:", mr: "सेंद्रिय कर्ब:", hi: "जैविक कार्बन:", te: "సేంద్రీయ కార్బన్:", kn: "ಸಾವಯವ ಇಂಗಾಲ:", gu: "જૈવિક કાર્બન:")} ${soil.getOrganicCarbon(!isMr)} • ${AppStrings.tr(loc, en: "Moisture Retention:", mr: "ओलावा धारणा:", hi: "नमी धारण:", te: "తేమ నిలుపుదల:", kn: "ತೇವಾಂಶ ಧಾರಣೆ:", gu: "ભેજ સંગ્રહ:")} ${soil.getWaterRetention(!isMr)}',
+                  '${AppStrings.tr(loc, en: "Organic Carbon:", mr: "सेंद्रिय कर्ब:", hi: "जैविक कार्बन:", te: "సేంద్రీయ కార్బన్:", kn: "ಸಾವಯವ ಇಂಗಾಲ:", gu: "જૈવિક કાર્બન:")} ${soil.getOrganicCarbon(!isMr)} • ${AppStrings.tr(loc, en: "Moisture Retention:", mr: "ओलावा धारणा:", hi: "नमी धारण:", te: "తేమ నిలుపుదల:", kn: "ತೇವಾಂಶ ಧಾರಣೆ:", gu: "ભೇજ સંગ્રહ:")} ${soil.getWaterRetention(!isMr)}',
                   style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 10),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -983,9 +999,9 @@ class _HomeViewState extends State<HomeView> {
             child: Row(
               children: soil.suitableCrops.map((crop) {
                 return Container(
-                  width: 140,
+                  width: 165,
                   margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   decoration: BoxDecoration(
                     color: AppColors.background,
                     borderRadius: BorderRadius.circular(12),
@@ -997,10 +1013,10 @@ class _HomeViewState extends State<HomeView> {
                       Row(
                         children: [
                           Text(crop.icon, style: const TextStyle(fontSize: 18)),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              crop.getName(!isMr).split(' ').first,
+                              crop.getName(!isMr),
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -1008,17 +1024,22 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 5),
                       Text(
                         crop.getYield(!isMr),
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.primary),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        crop.getReason(!isMr),
-                        style: const TextStyle(fontSize: 9, color: AppColors.textMuted),
-                        maxLines: 2,
+                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w900, color: AppColors.primary),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 3),
+                      SizedBox(
+                        height: 28,
+                        child: Text(
+                          crop.getReason(!isMr),
+                          style: const TextStyle(fontSize: 9.5, color: AppColors.textMuted, height: 1.25),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
@@ -1075,20 +1096,27 @@ class _HomeViewState extends State<HomeView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.auto_graph_rounded, color: Colors.deepPurple, size: 20),
-                  const SizedBox(width: 6),
-                  Text(
-                    AppStrings.get('myCropsForecastTitle', locale: loc),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textPrimary,
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.auto_graph_rounded, color: Colors.deepPurple, size: 20),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        AppStrings.get('myCropsForecastTitle', locale: loc),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               InkWell(
                 onTap: () => _showEditCropTrackerDialog(context, soilVm, loc),
                 child: Container(
@@ -1184,14 +1212,19 @@ class _HomeViewState extends State<HomeView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      forecast.getVerdictBadge(!isMr),
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        color: forecast.shouldHold ? AppColors.primary : AppColors.danger,
+                    Expanded(
+                      child: Text(
+                        forecast.getVerdictBadge(!isMr),
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w900,
+                          color: forecast.shouldHold ? AppColors.primary : AppColors.danger,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
@@ -1215,37 +1248,48 @@ class _HomeViewState extends State<HomeView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(AppStrings.get('todayPrice', locale: loc), style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
-                        Text(
-                          '₹${forecast.currentPrice.toStringAsFixed(0)}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                        ),
-                      ],
-                    ),
-                    Icon(
-                      forecast.shouldHold ? Icons.trending_up : Icons.trending_down,
-                      color: forecast.shouldHold ? Colors.green : Colors.red,
-                      size: 28,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '${AppStrings.get("projectedPrice", locale: loc)} (${forecast.daysAhead} ${AppStrings.tr(loc, en: "days", mr: "दिवस", hi: "दिन", te: "రోజులు", kn: "ದಿನಗಳು", gu: "દિવસ")})',
-                          style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
-                        ),
-                        Text(
-                          '₹${forecast.predictedPrice.toStringAsFixed(0)}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                            color: forecast.shouldHold ? AppColors.primary : Colors.red.shade700,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(AppStrings.get('todayPrice', locale: loc), style: const TextStyle(fontSize: 10, color: AppColors.textMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+                          Text(
+                            '₹${forecast.currentPrice.toStringAsFixed(0)}',
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: Icon(
+                        forecast.shouldHold ? Icons.trending_up : Icons.trending_down,
+                        color: forecast.shouldHold ? Colors.green : Colors.red,
+                        size: 26,
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${AppStrings.get("projectedPrice", locale: loc)} (${forecast.daysAhead} ${AppStrings.tr(loc, en: "days", mr: "दिवस", hi: "दिन", te: "రోజులు", kn: "ದಿನಗಳು", gu: "દિવસ")})',
+                            style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.end,
+                          ),
+                          Text(
+                            '₹${forecast.predictedPrice.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              color: forecast.shouldHold ? AppColors.primary : Colors.red.shade700,
+                            ),
+                            textAlign: TextAlign.end,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -1424,7 +1468,7 @@ class _HomeViewState extends State<HomeView> {
       crossAxisCount: 2,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
-      childAspectRatio: 1.55,
+      childAspectRatio: 1.38,
       children: [
         _buildActionTile(
           context,
