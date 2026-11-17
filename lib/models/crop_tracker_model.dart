@@ -52,7 +52,7 @@ class CropPriceForecast {
   final double predictedPrice;
   final double priceDelta;
   final double priceChangePercent;
-  final bool shouldHold; // true = HOLD, false = SELL
+  final bool shouldHold; // true = WAIT/HOLD FOR PROFIT, false = SELL NOW
   final String verdictBadge;
   final String verdictBadgeEn;
   final String advisoryText;
@@ -84,15 +84,50 @@ class CropPriceForecast {
   String getVerdictBadge(bool isEn) => isEn ? (verdictBadgeEn.isNotEmpty ? verdictBadgeEn : verdictBadge) : verdictBadge;
   String getAdvisory(bool isEn) => isEn ? (advisoryTextEn.isNotEmpty ? advisoryTextEn : advisoryText) : advisoryText;
 
-  factory CropPriceForecast.predict(String crop, double quantityQuintals) {
+  factory CropPriceForecast.predict(String crop, double quantityQuintals, {double? userCustomPrice}) {
     final lower = crop.toLowerCase();
 
-    // 1. Onion -> Price Drop expected (SELL NOW)
-    if (lower.contains('onion') || lower.contains('कांदा')) {
-      const current = 2350.0;
-      const predicted = 1950.0;
-      const delta = predicted - current;
-      return const CropPriceForecast(
+    // 1. Highly Perishable Vegetables & Fruits -> Price Drop Risk (SELL NOW)
+    final isPerishable = lower.contains('tomato') || lower.contains('टोमॅटो') || lower.contains('टमाटर') ||
+        lower.contains('watermelon') || lower.contains('कलिंगड') || lower.contains('तरबूज') ||
+        lower.contains('cabbage') || lower.contains('कोबी') || lower.contains('पत्तागोभी') ||
+        lower.contains('cauliflower') || lower.contains('फ्लॉवर') || lower.contains('फूलगोभी') ||
+        lower.contains('okra') || lower.contains('भेंडी') || lower.contains('भिंडी') ||
+        lower.contains('banana') || lower.contains('केळी') || lower.contains('केला') ||
+        lower.contains('guava') || lower.contains('पेरू') || lower.contains('अमरूद') ||
+        lower.contains('chilli') || lower.contains('मिरची') || lower.contains('मिर्च');
+
+    if (isPerishable) {
+      final current = userCustomPrice ?? (lower.contains('banana') ? 1950.0 : (lower.contains('chilli') ? 4200.0 : 2150.0));
+      final predicted = double.parse((current * 0.81).toStringAsFixed(1)); // -19%
+      final delta = double.parse((predicted - current).toStringAsFixed(1));
+      const dropPct = -19.0;
+
+      return CropPriceForecast(
+        cropName: crop,
+        cropNameEn: '$crop (Perishable)',
+        currentPrice: current,
+        predictedPrice: predicted,
+        priceDelta: delta,
+        priceChangePercent: dropPct,
+        shouldHold: false,
+        verdictBadge: '🔴 तात्काळ विक्री करा (SELL NOW)',
+        verdictBadgeEn: '🔴 SELL NOW (Perishable Spoilage Risk)',
+        advisoryText: 'स्थानिक आवक वेगाने वाढत असून नाशवंत स्वरूपामुळे साठवणूक नुकसान अधिक आहे. किंमत आणखी घसरण्यापूर्वी त्वरित नजीकच्या उच्च भाव देणाऱ्या बाजारपेठेत विक्री करा.',
+        advisoryTextEn: 'High supply influx and perishable post-harvest shelf life mean prolonged holding risks severe spoilage. Sell immediately at the highest-paying wholesale APMC to preserve your capital.',
+        potentialExtraProfit: 0.0,
+        daysAhead: 7,
+        confidencePercent: 92,
+        weeklyTrend: [current, current * 0.94, current * 0.88, predicted],
+      );
+    }
+
+    // 2. Onion (Seasonal Supply Gluts -> SELL NOW)
+    if (lower.contains('onion') || lower.contains('कांदा') || lower.contains('प्याज') || lower.contains('ડુંગળી')) {
+      final current = userCustomPrice ?? 2350.0;
+      final predicted = double.parse((current * 0.83).toStringAsFixed(1));
+      final delta = double.parse((predicted - current).toStringAsFixed(1));
+      return CropPriceForecast(
         cropName: 'कांदा (Onion)',
         cropNameEn: 'Onion (Kharif)',
         currentPrice: current,
@@ -106,41 +141,17 @@ class CropPriceForecast {
         advisoryTextEn: 'New Kharif onion arrivals are surging across wholesale mandis. Modal prices are projected to drop by ₹350–₹400/Qtl over the next 10-15 days. Immediate sale at nearest mandi is recommended.',
         potentialExtraProfit: 0.0,
         daysAhead: 15,
-        confidencePercent: 88,
-        weeklyTrend: [2350, 2220, 2100, 1950],
+        confidencePercent: 89,
+        weeklyTrend: [current, current * 0.95, current * 0.90, predicted],
       );
     }
 
-    // 2. Tomato -> Perishable Price Volatility (SELL NOW)
-    if (lower.contains('tomato') || lower.contains('टोमॅटो')) {
-      const current = 1850.0;
-      const predicted = 1500.0;
-      const delta = predicted - current;
-      return const CropPriceForecast(
-        cropName: 'टोमॅटो (Tomato)',
-        cropNameEn: 'Tomato',
-        currentPrice: current,
-        predictedPrice: predicted,
-        priceDelta: delta,
-        priceChangePercent: -18.9,
-        shouldHold: false,
-        verdictBadge: '🔴 त्वरित विक्री करा (SELL NOW)',
-        verdictBadgeEn: '🔴 SELL NOW (Perishable Risk)',
-        advisoryText: 'नाशवंत पीक असून बाजारात स्थानिक आवक वाढली आहे. साठवणूक न करता आजच सर्वोत्तम भाव देणाऱ्या बाजारपेठेत माल विका.',
-        advisoryTextEn: 'High post-harvest perishability and rising local supplies mean keeping stock carries heavy spoilage risk. Liquidate today at the top realization mandi.',
-        potentialExtraProfit: 0.0,
-        daysAhead: 7,
-        confidencePercent: 91,
-        weeklyTrend: [1850, 1720, 1600, 1500],
-      );
-    }
-
-    // 3. Cotton -> Price Rise expected (HOLD)
-    if (lower.contains('cotton') || lower.contains('कापूस')) {
-      const current = 7150.0;
-      const predicted = 7780.0;
-      const delta = predicted - current;
-      final gain = (delta * quantityQuintals).clamp(0.0, 999999.0);
+    // 3. Cotton -> Export & Mill Procurement Surge (HOLD FOR PROFIT)
+    if (lower.contains('cotton') || lower.contains('कापूस') || lower.contains('कपास') || lower.contains('పత్తి') || lower.contains('ಹತ್ತಿ') || lower.contains('કપાસ')) {
+      final current = userCustomPrice ?? 7150.0;
+      final predicted = double.parse((current + 630.0).toStringAsFixed(1));
+      final delta = predicted - current;
+      final gain = (delta * quantityQuintals).clamp(0.0, 9999999.0);
       return CropPriceForecast(
         cropName: 'कापूस (Cotton)',
         cropNameEn: 'Cotton (Long Staple)',
@@ -150,22 +161,22 @@ class CropPriceForecast {
         priceChangePercent: 8.8,
         shouldHold: true,
         verdictBadge: '🟢 साठवून ठेवा (HOLD FOR PROFIT)',
-        verdictBadgeEn: '🟢 HOLD STOCK (Price Surge Expected)',
-        advisoryText: 'जागतिक बाजारात कापसाच्या धाग्याला वाढती मागणी आणि जिनिंग मिलकडून मोठी खरेदी अपेक्षित आहे. पुढील २०-२५ दिवसांत भाव ₹६००+ ने वाढतील.',
+        verdictBadgeEn: '🟢 WAIT TO SELL (Price Surge Expected)',
+        advisoryText: 'जागतिक बाजारात कापसाच्या धाग्याला वाढती मागणी आणि जिनिंग मिलकडून मोठी खरेदी अपेक्षित आहे. पुढील २०-२५ दिवसांत भाव प्रति क्विंटल ₹६००+ ने वाढतील.',
         advisoryTextEn: 'Strong global yarn demand and active procurement by regional ginning mills will tighten spot supplies. Prices forecast to gain ₹600+/Qtl over the next 20-25 days.',
         potentialExtraProfit: gain,
         daysAhead: 25,
-        confidencePercent: 89,
-        weeklyTrend: const [7150, 7300, 7550, 7780],
+        confidencePercent: 91,
+        weeklyTrend: [current, current + 150, current + 400, predicted],
       );
     }
 
-    // 4. Tur / Arhar -> High Demand (HOLD)
-    if (lower.contains('tur') || lower.contains('तूर') || lower.contains('arhar')) {
-      const current = 9600.0;
-      const predicted = 10450.0;
-      const delta = predicted - current;
-      final gain = (delta * quantityQuintals).clamp(0.0, 999999.0);
+    // 4. Tur / Arhar -> High National Demand (HOLD FOR PROFIT)
+    if (lower.contains('tur') || lower.contains('तूर') || lower.contains('arhar') || lower.contains('अरहर') || lower.contains('కందులు') || lower.contains('ತೊಗರಿ') || lower.contains('તુવેર')) {
+      final current = userCustomPrice ?? 9600.0;
+      final predicted = double.parse((current + 850.0).toStringAsFixed(1));
+      final delta = predicted - current;
+      final gain = (delta * quantityQuintals).clamp(0.0, 9999999.0);
       return CropPriceForecast(
         cropName: 'तूर (Pigeon Pea)',
         cropNameEn: 'Tur / Pigeon Pea',
@@ -175,37 +186,70 @@ class CropPriceForecast {
         priceChangePercent: 8.9,
         shouldHold: true,
         verdictBadge: '🟢 साठवून ठेवा (HOLD FOR PROFIT)',
-        verdictBadgeEn: '🟢 HOLD FOR PROFIT (High Demand)',
-        advisoryText: 'डाळींची घरगुती मागणी तीव्र असून पुरवठा मर्यादित आहे. पुढील ३० दिवसांत भाव ₹१०,००० चा टप्पा पार करण्याची ९४% शक्यता आहे.',
-        advisoryTextEn: 'Strong domestic dal mill buying alongside tight national pipeline stocks. There is a 94% statistical probability of crossing ₹10,000/Qtl within 30 days.',
+        verdictBadgeEn: '🟢 WAIT TO SELL (Record High Demand)',
+        advisoryText: 'डाळींची घरगुती मागणी तीव्र असून पुरवठा मर्यादित आहे. पुढील ३० दिवसांत भाव ₹१०,००० चा टप्पा पार करण्याची ९४% शक्यता आहे. साठा टिकवून ठेवा.',
+        advisoryTextEn: 'Strong domestic dal mill buying alongside tight national pipeline stocks. Statistical probability of crossing ₹10,000/Qtl within 30 days is 94%. Hold your stock.',
         potentialExtraProfit: gain,
         daysAhead: 30,
         confidencePercent: 94,
-        weeklyTrend: const [9600, 9850, 10150, 10450],
+        weeklyTrend: [current, current + 250, current + 550, predicted],
       );
     }
 
-    // 5. Default Soybean -> Price Rise Expected (HOLD)
-    const current = 4820.0;
-    const predicted = 5380.0;
-    const delta = predicted - current;
-    final gain = (delta * quantityQuintals).clamp(0.0, 999999.0);
+    // 5. Spices & High Value Dry Crops (Turmeric, Garlic, Cumin, Raisins, Ginger) -> Strong Surge (HOLD)
+    final isSpices = lower.contains('turmeric') || lower.contains('हळद') || lower.contains('हल्दी') || lower.contains('పసుపు') ||
+        lower.contains('garlic') || lower.contains('लसूण') || lower.contains('लहसुन') ||
+        lower.contains('cumin') || lower.contains('जिरे') || lower.contains('जीरा') || lower.contains('જીરું') ||
+        lower.contains('raisin') || lower.contains('बेदाणे') || lower.contains('मनुका') || lower.contains('किशमिश') ||
+        lower.contains('ginger') || lower.contains('आले') || lower.contains('अदरक');
+
+    if (isSpices) {
+      final current = userCustomPrice ?? (lower.contains('turmeric') ? 15800.0 : (lower.contains('cumin') ? 31000.0 : 13500.0));
+      final predicted = double.parse((current * 1.12).toStringAsFixed(1)); // +12%
+      final delta = double.parse((predicted - current).toStringAsFixed(1));
+      final gain = (delta * quantityQuintals).clamp(0.0, 9999999.0);
+
+      return CropPriceForecast(
+        cropName: crop,
+        cropNameEn: '$crop (Spices & Commercial)',
+        currentPrice: current,
+        predictedPrice: predicted,
+        priceDelta: delta,
+        priceChangePercent: 12.0,
+        shouldHold: true,
+        verdictBadge: '🟢 साठवून ठेवा (HOLD FOR PROFIT)',
+        verdictBadgeEn: '🟢 WAIT TO SELL (+12% Expected Gain)',
+        advisoryText: 'मसाल्यांची निर्यात मागणी आणि औषधी वापरामुळे स्पॉट बाजारात पुरवठा अपुरा आहे. साठवणुकीत वजन घट कमी असल्याने पुढील २०-३० दिवस माल रोखून ठेवल्यास मोठा फायदा होईल.',
+        advisoryTextEn: 'Robust export demand and steady pharmaceutical/spices processing purchases indicate rising procurement rates. With minimal storage shrinkage, holding stock offers superior net margins.',
+        potentialExtraProfit: gain,
+        daysAhead: 25,
+        confidencePercent: 93,
+        weeklyTrend: [current, current * 1.03, current * 1.07, predicted],
+      );
+    }
+
+    // 6. Grains & Pulses (Wheat, Rice, Maize, Chana, Moong, Soybean, Bajra, Jowar) -> Steady Rise (HOLD)
+    final current = userCustomPrice ?? 4820.0;
+    final predicted = double.parse((current * 1.116).toStringAsFixed(1)); // +11.6%
+    final delta = double.parse((predicted - current).toStringAsFixed(1));
+    final gain = (delta * quantityQuintals).clamp(0.0, 9999999.0);
+
     return CropPriceForecast(
-      cropName: 'सोयाबीन (Soybean)',
-      cropNameEn: 'Soybean (Yellow)',
+      cropName: crop,
+      cropNameEn: '$crop (Commodity)',
       currentPrice: current,
       predictedPrice: predicted,
       priceDelta: delta,
       priceChangePercent: 11.6,
       shouldHold: true,
       verdictBadge: '🟢 साठवून ठेवा (HOLD FOR PROFIT)',
-      verdictBadgeEn: '🟢 HOLD FOR PROFIT (+₹560/Qtl)',
-      advisoryText: 'स्थानिक बाजारपेठेत सोयाबीनची आवक कमी होत आहे आणि केंद्र सरकारच्या खाद्यतेल धोरणामुळे सोयाबीन डीओसी (DOC) मागणी वाढली आहे. पुढील १५-२५ दिवसांत भाव प्रति क्विंटल ₹५६० ने वाढण्याचा अंदाज.',
-      advisoryTextEn: 'Spot mandi arrivals are tapering while edible oil import duty adjustments and strong poultry DOC demand support firm recovery. Prices projected to gain ₹560/Qtl in 15-25 days.',
+      verdictBadgeEn: '🟢 WAIT TO SELL (Steady Price Recovery)',
+      advisoryText: 'स्थानिक बाजारपेठेत आवक कमी होत असून प्रक्रिया उद्योगांची खरेदी वाढत आहे. पुढील १५-२५ दिवसांत भाव प्रति क्विंटल वाढण्याचा अंदाज असून साठवणूक फायदेशीर ठरेल.',
+      advisoryTextEn: 'Spot arrivals are tapering while industrial processor procurement accelerates. Modal rates projected to firm up over the next 15-25 days. Holding current stock is recommended.',
       potentialExtraProfit: gain,
       daysAhead: 20,
-      confidencePercent: 92,
-      weeklyTrend: const [4820, 4980, 5180, 5380],
+      confidencePercent: 90,
+      weeklyTrend: [current, current * 1.03, current * 1.07, predicted],
     );
   }
 }

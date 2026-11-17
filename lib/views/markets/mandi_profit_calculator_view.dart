@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../models/mandi_model.dart';
 import '../../services/mandi_directory_service.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../../viewmodels/mandi_viewmodel.dart';
+import '../forecast/ai_price_forecast_view.dart';
 
 class MandiProfitCalculatorView extends StatefulWidget {
   final String? initialCommodity;
@@ -314,7 +316,96 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ==========================================
-            // STEP 1: SELECT FARMER'S PRIMARY CITY
+            // STEP 1: SELECT FARMER'S STATE
+            // ==========================================
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.cardBorder),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x06000000), blurRadius: 8, offset: Offset(0, 2)),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.account_balance_rounded, color: AppColors.primary, size: 20),
+                          const SizedBox(width: 6),
+                          Text(
+                            AppStrings.tr(
+                              loc,
+                              en: 'Step 1: Select Your State',
+                              mr: 'पायरी १: आपले राज्य निवडा (Select State)',
+                              hi: 'चरण १: अपना राज्य चुनें (Select State)',
+                              te: 'దశ 1: మీ రాష్ట్రాన్ని ఎంచుకోండి (State)',
+                              kn: 'ಹಂತ 1: ನಿಮ್ಮ ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ (State)',
+                              gu: 'પગલું 1: તમારું રાજ્ય પસંદ કરો (State)',
+                            ),
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          mandiVm.selectedState.getName(loc),
+                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    AppStrings.tr(
+                      loc,
+                      en: 'Choose your state to see local districts & nearby APMCs:',
+                      mr: 'जिल्हे व बाजारपेठा पाहण्यासाठी आपले राज्य निवडा:',
+                      hi: 'जिले और नजदीकी मंडियां देखने के लिए अपना राज्य चुनें:',
+                      te: 'స్థానిక జిల్లాలు & మార్కెట్లను చూడటానికి మీ రాష్ట్రాన్ని ఎంచుకోండి:',
+                      kn: 'ಸ್ಥಳೀಯ ಜಿಲ್ಲೆಗಳು ಮತ್ತು ಮಾರುಕಟ್ಟೆಗಳನ್ನು ನೋಡಲು ನಿಮ್ಮ ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ:',
+                      gu: 'જિલ્લાઓ અને નજીકના બજારો જોવા માટે તમારું રાજ્ય પસંદ કરો:',
+                    ),
+                    style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<StateLocation>(
+                    key: ValueKey('state_${mandiVm.selectedState.id}'),
+                    initialValue: mandiVm.selectedState,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.map_rounded, color: AppColors.primary, size: 20),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    items: mandiVm.states.map((st) {
+                      return DropdownMenuItem(
+                        value: st,
+                        child: Text(st.getName(loc)),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        mandiVm.setStateLocation(val);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // ==========================================
+            // STEP 2: SELECT FARMER'S PRIMARY CITY
             // ==========================================
             Container(
               padding: const EdgeInsets.all(14),
@@ -337,13 +428,15 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
                           const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 20),
                           const SizedBox(width: 6),
                           Text(
-                            {
-                              'mr': 'पायरी १: आपले शहर / जिल्हा निवडा (Select City)',
-                              'hi': 'चरण १: अपना शहर / जिला चुनें (Select City)',
-                              'te': 'దశ 1: మీ నగరం / జిల్లాను ఎంచుకోండి (City)',
-                              'kn': 'ಹಂತ 1: ನಿಮ್ಮ ನಗರ / ಜಿಲ್ಲೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ (City)',
-                              'gu': 'પગલું 1: તમારું શહેર / જિલ્લો પસંદ કરો (City)',
-                            }[loc] ?? 'Step 1: Select Your Nearest City / District',
+                            AppStrings.tr(
+                              loc,
+                              en: 'Step 2: Select City / District',
+                              mr: 'पायरी २: आपले शहर / जिल्हा निवडा (City)',
+                              hi: 'चरण २: अपना शहर / जिला चुनें (City)',
+                              te: 'దశ 2: మీ నగరం / జిల్లాను ఎంచుకోండి (City)',
+                              kn: 'ಹಂತ 2: ನಿಮ್ಮ ನಗರ / ಜಿಲ್ಲೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ (City)',
+                              gu: 'પગલું 2: તમારું શહેર / જિલ્લો પસંદ કરો (City)',
+                            ),
                             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                           ),
                         ],
@@ -363,24 +456,27 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    {
-                      'mr': 'या शहरापासून सर्व बाजारपेठांचे अचूक रोड अंतर (km) मोजले जाईल:',
-                      'hi': 'इस शहर से सभी मंडियों की सटीक सड़क दूरी (km) मापी जाएगी:',
-                      'te': 'ఈ నగరం ఆధారంగా ఖచ్చితమైన రహదారి దూరం (km) లెక్కించబడుతుంది:',
-                      'kn': 'ಈ ನಗರದಿಂದ ಎಲ್ಲಾ ಮಾರುಕಟ್ಟೆಗಳ ನಿಖರ ರಸ್ತೆ ದೂರವನ್ನು (km) ಲೆಕ್ಕಿಸಲಾಗುತ್ತದೆ:',
-                      'gu': 'આ શહેરથી બધી બજારોનું સચોટ અંતર (km) ગણવામાં આવશે:',
-                    }[loc] ?? 'Accurate road distances to wholesale APMCs are calculated from here:',
+                    AppStrings.tr(
+                      loc,
+                      en: 'Accurate road distances to wholesale APMCs are calculated from here:',
+                      mr: 'या शहरापासून सर्व बाजारपेठांचे अचूक रोड अंतर (km) मोजले जाईल:',
+                      hi: 'इस शहर से सभी मंडियों की सटीक सड़क दूरी (km) मापी जाएगी:',
+                      te: 'ఈ నగరం ఆధారంగా ఖచ్చితమైన రహదారి దూరం (km) లెಕ್ಕించబడుతుంది:',
+                      kn: 'ಈ ನಗರದಿಂದ ಎಲ್ಲಾ ಮಾರುಕಟ್ಟೆಗಳ ನಿಖರ ರಸ್ತೆ ದೂರವನ್ನು (km) ಲೆಕ್ಕಿಸಲಾಗುತ್ತದೆ:',
+                      gu: 'આ શહેરથી બધી બજારોનું સચોટ અંતર (km) ગણવામાં આવશે:',
+                    ),
                     style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<CityLocation>(
+                    key: ValueKey('city_${mandiVm.selectedState.id}_${mandiVm.selectedCity.id}'),
                     initialValue: mandiVm.selectedCity,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.location_city_rounded, color: AppColors.primary, size: 20),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    items: MandiDirectoryService.cities.map((city) {
+                    items: mandiVm.citiesForSelectedState.map((city) {
                       return DropdownMenuItem(
                         value: city,
                         child: Text(city.getName(loc)),
@@ -398,7 +494,7 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
             const SizedBox(height: 14),
 
             // ==========================================
-            // STEP 2: CATEGORY & CROP SELECTOR
+            // STEP 3: CATEGORY & CROP SELECTOR
             // ==========================================
             Container(
               padding: const EdgeInsets.all(14),
@@ -418,13 +514,15 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
                       const Icon(Icons.category_rounded, color: AppColors.primary, size: 20),
                       const SizedBox(width: 6),
                       Text(
-                        {
-                          'mr': 'पायरी २: पिकाचा वर्ग व पीक निवडा (Select Crop)',
-                          'hi': 'चरण २: फसल की श्रेणी व फसल चुनें (Select Crop)',
-                          'te': 'దశ 2: పంట వర్గం మరియు పంటను ఎంచుకోండి',
-                          'kn': 'ಹಂತ 2: ಬೆಳೆ ವರ್ಗ ಮತ್ತು ಬೆಳೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ',
-                          'gu': 'પગલું 2: પાકની શ્રેણી અને પાક પસંદ કરો',
-                        }[loc] ?? 'Step 2: Select Crop Category & Crop',
+                        AppStrings.tr(
+                          loc,
+                          en: 'Step 3: Select Crop Category & Crop',
+                          mr: 'पायरी ३: पिकाचा वर्ग व पीक निवडा (Select Crop)',
+                          hi: 'चरण ३: फसल की श्रेणी व फसल चुनें (Select Crop)',
+                          te: 'దశ 3: పంట వర్గం మరియు పంటను ఎంచుకోండి',
+                          kn: 'ಹಂತ 3: ಬೆಳೆ ವರ್ಗ ಮತ್ತು ಬೆಳೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+                          gu: 'પગલું 3: પાકની શ્રેણી અને પાક પસંદ કરો',
+                        ),
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                       ),
                     ],
@@ -511,7 +609,7 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
             const SizedBox(height: 14),
 
             // ==========================================
-            // STEP 3: QUANTITY & AUTO VEHICLE SELECTION
+            // STEP 4: QUANTITY & AUTO VEHICLE SELECTION
             // ==========================================
             Container(
               padding: const EdgeInsets.all(14),
@@ -534,13 +632,15 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
                           const Icon(Icons.scale_rounded, color: AppColors.primary, size: 20),
                           const SizedBox(width: 6),
                           Text(
-                            {
-                              'mr': 'पायरी ३: शेतमालाचे वजन (Quantity)',
-                              'hi': 'चरण ३: उपज की मात्रा (Quantity)',
-                              'te': 'దశ 3: దిగుబడి పరిమాణం (క్వింటాళ్ళు)',
-                              'kn': 'ಹಂತ 3: ಬೆಳೆ ತೂಕ (ಕ್ವಿಂಟಾಲ್)',
-                              'gu': 'પગલું 3: ઉપજનું વજન (ક્વિન્ટલ)',
-                            }[loc] ?? 'Step 3: Enter Harvest Quantity (Quintals)',
+                            AppStrings.tr(
+                              loc,
+                              en: 'Step 4: Enter Harvest Quantity (Quintals)',
+                              mr: 'पायरी ४: शेतमालाचे वजन (Quantity)',
+                              hi: 'चरण ४: उपज की मात्रा (Quantity)',
+                              te: 'దశ 4: దిగుబడి పరిమాణం (క్వింటాళ్ళు)',
+                              kn: 'ಹಂತ 4: ಬೆಳೆ ತೂಕ (ಕ್ವಿಂಟಾಲ್)',
+                              gu: 'પગલું 4: ઉપજનું વજન (ક્વિન્ટલ)',
+                            ),
                             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                           ),
                         ],
@@ -720,8 +820,28 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
             const SizedBox(height: 16),
 
             // ==========================================
-            // STEP 4: OUTPUT REALIZATION & WINNER MANDI
+            // STEP 5: OUTPUT REALIZATION & WINNER MANDI (ANSWER)
             // ==========================================
+            Row(
+              children: [
+                const Icon(Icons.stars_rounded, color: Colors.amber, size: 22),
+                const SizedBox(width: 6),
+                Text(
+                  AppStrings.tr(
+                    loc,
+                    en: 'Step 5: Highest In-Hand Profit Mandi (Answer)',
+                    mr: 'पायरी ५: सर्वाधिक हातात उरणारा निव्वळ नफा (निकाल)',
+                    hi: 'चरण ५: सर्वाधिक शुद्ध लाभ देने वाली मंडी (उत्तर)',
+                    te: 'దశ 5: అత్యధిక నికర లాభం కలిగిన మార్కెట్ (సమాధానం)',
+                    kn: 'ಹಂತ 5: ಅತಿ ಹೆಚ್ಚು ನಿವ್ವಳ ಲಾಭದ ಮಾರುಕಟ್ಟೆ (ಉತ್ತರ)',
+                    gu: 'પગલું 5: સૌથી વધુ ચોખ્ખો નફો આપતી બજાર (જવાબ)',
+                  ),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
             if (winner != null) ...[
               Container(
                 width: double.infinity,
@@ -824,6 +944,76 @@ class _MandiProfitCalculatorViewState extends State<MandiProfitCalculatorView> {
                       ],
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // AI Price Forecast Hold vs Sell Shortcut Banner
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AiPriceForecastView(
+                        initialCrop: mandiVm.selectedCommodity,
+                        initialQuantity: mandiVm.weightQuintals,
+                      ),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.shade50,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.deepPurple.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple.shade100,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.auto_graph_rounded, color: Colors.deepPurple, size: 20),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppStrings.tr(
+                                loc,
+                                en: 'AI Price Forecast: Hold vs. Sell?',
+                                mr: 'AI भाव अंदाज: साठवून ठेवावे की विकावे?',
+                                hi: 'AI मूल्य पूर्वानुमान: रखें या बेचें?',
+                                te: 'AI ధర అంచనా: నిల్వ చేయాలా లేదా అమ్మాలా?',
+                                kn: 'AI ಬೆಲೆ ಮುನ್ಸೂಚನೆ: ಶೇಖರಿಸಿಡಬೇಕೇ ಅಥವಾ ಮಾರಬೇಕೇ?',
+                                gu: 'AI ભાવ અનુમાન: રાખો કે વેચો?',
+                              ),
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                            ),
+                            Text(
+                              AppStrings.tr(
+                                loc,
+                                en: 'Check if ${mandiVm.selectedCommodity} price will rise or drop in 15-30 days ➔',
+                                mr: 'पुढील १५-३० दिवसांत या पिकाचा भाव वाढेल की घसरेल? अंदाज पहा ➔',
+                                hi: 'जानें क्या अगले 15-30 दिनों में भाव बढ़ेगा या गिरेगा ➔',
+                                te: 'రాబోయే 15-30 రోజుల్లో ధర పెరుగుతుందా లేదా తగ్గుతుందా చూడండి ➔',
+                                kn: 'ಮುಂದಿನ 15-30 ದಿನಗಳಲ್ಲಿ ಬೆಲೆ ಹೆಚ್ಚಾಗುವುದೇ ಅಥವಾ ಕುಸಿಯುವುದೇ ನೋಡಿ ➔',
+                                gu: 'આગામી 15-30 દિવસમાં ભાવ વધશે કે ઘટશે તે જુઓ ➔',
+                              ),
+                              style: TextStyle(fontSize: 10, color: Colors.deepPurple.shade700),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.deepPurple),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),

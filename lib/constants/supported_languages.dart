@@ -1,4 +1,4 @@
-﻿class AppLanguage {
+class AppLanguage {
   final String code;
   final String nativeName;
   final String englishName;

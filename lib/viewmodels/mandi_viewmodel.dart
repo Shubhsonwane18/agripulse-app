@@ -10,6 +10,12 @@ class MandiViewModel extends ChangeNotifier {
   String _selectedVehicle = 'tata_ace';
   final double _dieselPrice = 92.0;
   String _selectedCommodity = 'Soybean';
+
+  StateLocation _selectedState = MandiDirectoryService.states.firstWhere(
+    (s) => s.id == 'maharashtra',
+    orElse: () => MandiDirectoryService.states.first,
+  );
+
   CityLocation _selectedCity = MandiDirectoryService.cities.firstWhere(
     (c) => c.id == 'kolhapur',
     orElse: () => MandiDirectoryService.cities.first,
@@ -28,7 +34,10 @@ class MandiViewModel extends ChangeNotifier {
   String get selectedVehicle => _selectedVehicle;
   double get dieselPrice => _dieselPrice;
   String get selectedCommodity => _selectedCommodity;
+  StateLocation get selectedState => _selectedState;
   CityLocation get selectedCity => _selectedCity;
+  List<StateLocation> get states => MandiDirectoryService.states;
+  List<CityLocation> get citiesForSelectedState => MandiDirectoryService.getCitiesByState(_selectedState.id);
   bool get isLoading => _isLoading;
   List<MandiEvaluation> get rankings => _rankings;
   String? get errorMessage => _errorMessage;
@@ -48,9 +57,23 @@ class MandiViewModel extends ChangeNotifier {
     return 0.0;
   }
 
+  void setStateLocation(StateLocation state) {
+    if (_selectedState.id != state.id) {
+      _selectedState = state;
+      final citiesInState = MandiDirectoryService.getCitiesByState(state.id);
+      _selectedCity = citiesInState.first;
+      calculateArbitrage();
+    }
+  }
+
   void setCity(CityLocation city) {
     if (_selectedCity.id != city.id) {
       _selectedCity = city;
+      final stateMatch = MandiDirectoryService.states.firstWhere(
+        (s) => s.id == city.stateId,
+        orElse: () => _selectedState,
+      );
+      _selectedState = stateMatch;
       calculateArbitrage();
     }
   }
@@ -114,16 +137,17 @@ class MandiViewModel extends ChangeNotifier {
         selectedCity: _selectedCity,
       );
 
-      final results = await _apiService.calculateArbitrage(
+      final result = await _apiService.calculateArbitrage(
         weightQuintals: _weightQuintals,
         vehicleType: _selectedVehicle,
         mandis: candidates,
       );
 
-      _rankings = results;
+      _rankings = result;
+      _isLoading = false;
+      notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
-    } finally {
       _isLoading = false;
       notifyListeners();
     }

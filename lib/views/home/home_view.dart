@@ -17,6 +17,7 @@ import '../khata/farm_khata_view.dart';
 import '../intercropping/intercropping_view.dart';
 import '../profile/profile_view.dart';
 import '../language/language_selection_view.dart';
+import '../forecast/ai_price_forecast_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -1284,6 +1285,54 @@ class _HomeViewState extends State<HomeView> {
                   forecast.getAdvisory(!isMr),
                   style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                 ),
+                const SizedBox(height: 10),
+
+                // Button to open dedicated AI Price Forecast Page
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AiPriceForecastView(
+                          initialCrop: tracker.growingCrop,
+                          initialQuantity: tracker.storedStockQuintals,
+                        ),
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.deepPurple.shade200),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.insights_rounded, color: Colors.deepPurple, size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          AppStrings.tr(
+                            loc,
+                            en: 'Open Full AI Price Forecast & Crop Analyzer ➔',
+                            mr: 'सविस्तर AI भाव भाकीत कॅल्क्युलेटर उघडा ➔',
+                            hi: 'विस्तृत AI मूल्य पूर्वानुमान व विश्लेषण देखें ➔',
+                            te: 'పూర్తి AI ధరల అంచనా తెరవండి ➔',
+                            kn: 'ಸಂಪೂರ್ಣ AI ಬೆಲೆ ಮುನ್ಸೂಚನೆ ತೆರೆಯಿರಿ ➔',
+                            gu: 'સંપૂર્ણ AI ભાવ અનુમાન કેલ્ક્યુલેટર ખોલો ➔',
+                          ),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -1442,6 +1491,35 @@ class _HomeViewState extends State<HomeView> {
             );
           },
         ),
+        _buildActionTile(
+          context,
+          icon: Icons.auto_graph_rounded,
+          color: Colors.deepPurple,
+          title: AppStrings.tr(
+            loc,
+            en: 'AI Price Forecast',
+            mr: 'AI भाव अंदाज',
+            hi: 'AI मूल्य पूर्वानुमान',
+            te: 'AI ధరల అంచనా',
+            kn: 'AI ಬೆಲೆ ಮುನ್ಸೂಚನೆ',
+            gu: 'AI ભાવ અનુમાન',
+          ),
+          subtitle: AppStrings.tr(
+            loc,
+            en: 'Hold vs. Sell Advisor',
+            mr: 'साठवून ठेवा की विका?',
+            hi: 'रोकें या बेचें? सटीक सलाह',
+            te: 'నిల్వ ఉంచాలా లేదా అమ్మాలా?',
+            kn: 'ಶೇಖರಿಸಿಡಬೇಕೇ ಅಥವಾ ಮಾರಬೇಕೇ?',
+            gu: 'રાખો કે વેચો? સલાહકાર',
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AiPriceForecastView()),
+            );
+          },
+        ),
       ],
     );
   }
@@ -1534,6 +1612,24 @@ class _HomeViewState extends State<HomeView> {
             onTap: () {
               Navigator.pop(context);
               Navigator.push(context, MaterialPageRoute(builder: (_) => const MandiProfitCalculatorView()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.auto_graph_rounded, color: Colors.deepPurple),
+            title: Text(
+              AppStrings.tr(
+                loc,
+                en: 'AI Price Forecast (Hold vs. Sell)',
+                mr: 'AI भाव अंदाज (साठवून ठेवा की विका)',
+                hi: 'AI मूल्य पूर्वानुमान (रोकें या बेचें)',
+                te: 'AI ధరల అంచనా (నిల్వ లేదా అమ్మకం)',
+                kn: 'AI ಬೆಲೆ ಮುನ್ಸೂಚನೆ (ಶೇಖರಿಸಿ ಅಥವಾ ಮಾರಿ)',
+                gu: 'AI ભાવ અનુમાન (રાખો કે વેચો)',
+              ),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const AiPriceForecastView()));
             },
           ),
           ListTile(
