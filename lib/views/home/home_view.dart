@@ -4,6 +4,7 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../constants/supported_languages.dart';
 import '../../models/mandi_model.dart';
+import '../../services/mandi_directory_service.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../../viewmodels/weather_viewmodel.dart';
 import '../../viewmodels/mandi_viewmodel.dart';
@@ -36,31 +37,13 @@ class _HomeViewState extends State<HomeView> {
     'Wheat',
   ];
 
-  final Map<String, String> _commodityLabelsMr = {
-    'Soybean': '🌱 सोयाबीन',
-    'Cotton': '☁️ कापूस',
-    'Onion': '🧅 कांदा',
-    'Tomato': '🍅 टोमॅटो',
-    'Tur': '🌾 तूर',
-    'Wheat': '🌾 गहू',
-  };
-
-  final Map<String, String> _commodityLabelsEn = {
-    'Soybean': '🌱 Soybean',
-    'Cotton': '☁️ Cotton',
-    'Onion': '🧅 Onion',
-    'Tomato': '🍅 Tomato',
-    'Tur': '🌾 Tur / Arhar',
-    'Wheat': '🌾 Wheat',
-  };
-
   @override
   void dispose() {
     _customStockController.dispose();
     super.dispose();
   }
 
-  void _showEditCropTrackerDialog(BuildContext context, SoilViewModel soilVm, bool isEn) {
+  void _showEditCropTrackerDialog(BuildContext context, SoilViewModel soilVm, String loc) {
     String currentCrop = soilVm.cropTracker.growingCrop;
     double currentStock = soilVm.cropTracker.storedStockQuintals;
     _customStockController.text = currentStock.toStringAsFixed(0);
@@ -74,9 +57,19 @@ class _HomeViewState extends State<HomeView> {
             children: [
               const Icon(Icons.edit_note_rounded, color: AppColors.primary),
               const SizedBox(width: 8),
-              Text(
-                isEn ? 'Update Standing Crop & Stock' : 'पिके व साठा नोंदवा',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Expanded(
+                child: Text(
+                  AppStrings.tr(
+                    loc,
+                    en: 'Update Standing Crop & Stock',
+                    mr: 'उभे पीक व शिल्लक साठा नोंदवा',
+                    hi: 'खेत की फसल व स्टॉक दर्ज करें',
+                    te: 'పంట మరియు నిల్వ వివరాలు నమోదు చేయండి',
+                    kn: 'ಬೆಳೆ ಮತ್ತು ದಾಸ್ತಾನು ವಿವರ ದಾಖಲಿಸಿ',
+                    gu: 'પાક અને સંગ્રહ વિગતો નોંધો',
+                  ),
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
@@ -85,31 +78,42 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isEn ? 'Currently Growing Crop in Field:' : 'सध्या शेतात उभे असलेले पीक:',
+                AppStrings.tr(
+                  loc,
+                  en: 'Currently Growing Crop in Field:',
+                  mr: 'सध्या शेतात उभे असलेले पीक:',
+                  hi: 'वर्तमान में खेत में खड़ी फसल:',
+                  te: 'ప్రస్తుతం పొలంలో ఉన్న పంట:',
+                  kn: 'ಪ್ರಸ್ತುತ ಹೊಲದಲ್ಲಿರುವ ಬೆಳೆ:',
+                  gu: 'હાલમાં ખેતરમાં ઉભો પાક:',
+                ),
                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
               DropdownButtonFormField<String>(
-                value: _commodities.contains(currentCrop)
+                initialValue: _commodities.contains(currentCrop)
                     ? currentCrop
-                    : (currentCrop.contains('कापूस') || currentCrop.contains('Cotton')
+                    : (currentCrop.contains('Cotton') || currentCrop.contains('कापूस') || currentCrop.contains('कपास')
                         ? 'Cotton'
-                        : (currentCrop.contains('कांदा') || currentCrop.contains('Onion')
+                        : (currentCrop.contains('Onion') || currentCrop.contains('कांदा') || currentCrop.contains('प्याज')
                             ? 'Onion'
-                            : (currentCrop.contains('तूर') || currentCrop.contains('Tur')
-                                ? 'Tur'
-                                : (currentCrop.contains('टोमॅटो') || currentCrop.contains('Tomato')
-                                    ? 'Tomato'
+                            : (currentCrop.contains('Tomato') || currentCrop.contains('टोमॅटो') || currentCrop.contains('टमाटर')
+                                ? 'Tomato'
+                                : (currentCrop.contains('Tur') || currentCrop.contains('तूर') || currentCrop.contains('अरहर')
+                                    ? 'Tur'
                                     : 'Soybean')))),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 ),
                 items: _commodities.map((c) {
-                  final label = isEn ? (_commodityLabelsEn[c] ?? c) : (_commodityLabelsMr[c] ?? c);
+                  final cropMatch = MandiDirectoryService.crops.firstWhere(
+                    (item) => item.id.toLowerCase() == c.toLowerCase(),
+                    orElse: () => MandiDirectoryService.crops.first,
+                  );
                   return DropdownMenuItem(
                     value: c,
-                    child: Text(label),
+                    child: Text(cropMatch.getName(loc)),
                   );
                 }).toList(),
                 onChanged: (val) {
@@ -122,7 +126,15 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 14),
               Text(
-                isEn ? 'Stored Farm Stock (Quintals):' : 'घरी / गोदामात शिल्लक साठा (क्विंटल):',
+                AppStrings.tr(
+                  loc,
+                  en: 'Stored Farm Stock (Quintals):',
+                  mr: 'घरी / गोदामात शिल्लक साठा (क्विंटल):',
+                  hi: 'घर / गोदाम में बचा स्टॉक (क्विंटल):',
+                  te: 'నిల్వ ఉన్న స్టాక్ (క్వింటాళ్ళు):',
+                  kn: 'ದಾಸ್ತಾನು ಪ್ರಮಾಣ (ಕ್ವಿಂಟಾಲ್):',
+                  gu: 'ગોડાઉનમાં બાકી સ્ટોક (ક્વિન્ટલ):',
+                ),
                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
@@ -130,7 +142,7 @@ class _HomeViewState extends State<HomeView> {
                 controller: _customStockController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  suffixText: isEn ? 'Qtl' : 'क्विंटल',
+                  suffixText: AppStrings.tr(loc, en: 'Qtl', mr: 'क्विंटल', hi: 'क्विंटल', te: 'క్వింటాళ్ళు', kn: 'ಕ್ವಿಂಟಾಲ್', gu: 'ક્વિન્ટલ'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 ),
@@ -140,25 +152,35 @@ class _HomeViewState extends State<HomeView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text(isEn ? 'Cancel' : 'रद्द करा'),
+              child: Text(AppStrings.tr(loc, en: 'Cancel', mr: 'रद्द करा', hi: 'रद्द करें', te: 'రద్దు చేయి', kn: 'ರದ್ದುಮಾಡಿ', gu: 'રદ કરો')),
             ),
             ElevatedButton(
               onPressed: () {
                 final qty = double.tryParse(_customStockController.text.trim()) ?? 35.0;
                 soilVm.updateCropTracker(
-                  growingCrop: isEn ? (_commodityLabelsEn[currentCrop] ?? currentCrop) : (_commodityLabelsMr[currentCrop] ?? currentCrop),
+                  growingCrop: currentCrop,
                   storedStockQuintals: qty,
                 );
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(isEn ? '✓ Crop details & AI forecast updated!' : '✓ पिकांची माहिती व AI अंदाज अपडेट केला!'),
+                    content: Text(
+                      AppStrings.tr(
+                        loc,
+                        en: '✓ Crop details & AI forecast updated!',
+                        mr: '✓ पिकांची माहिती व AI अंदाज अपडेट केला!',
+                        hi: '✓ फसल विवरण एवं AI पूर्वानुमान अपडेट हुआ!',
+                        te: '✓ పంట వివరాలు మరియు AI అంచనా అప్‌డేట్ చేయబడ్డాయి!',
+                        kn: '✓ ಬೆಳೆ ವಿವರಗಳು ಮತ್ತು AI ಮುನ್ಸೂಚನೆ ನವೀಕರಿಸಲಾಗಿದೆ!',
+                        gu: '✓ પાકની વિગતો અને AI અનુમાન અપડેટ થયું!',
+                      ),
+                    ),
                     backgroundColor: AppColors.primary,
                   ),
                 );
               },
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-              child: Text(isEn ? 'Save' : 'सेव्ह करा'),
+              child: Text(AppStrings.tr(loc, en: 'Save', mr: 'सेव्ह करा', hi: 'सहेजें', te: 'సేవ్ చేయి', kn: 'ಉಳಿಸಿ', gu: 'સાચવો')),
             ),
           ],
         ),
@@ -173,7 +195,6 @@ class _HomeViewState extends State<HomeView> {
     final mandiVm = context.watch<MandiViewModel>();
     final soilVm = context.watch<SoilViewModel>();
     final loc = authVm.locale;
-    final isEn = authVm.isEn;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -183,7 +204,7 @@ class _HomeViewState extends State<HomeView> {
         leading: Builder(
           builder: (ctx) => IconButton(
             icon: const Icon(Icons.menu_rounded, color: Colors.white),
-            tooltip: isEn ? 'Menu' : 'मेनू',
+            tooltip: AppStrings.tr(loc, en: 'Menu', mr: 'मेनू', hi: 'मेनू', te: 'మెనూ', kn: 'ಮೆನು', gu: 'મેનૂ'),
             onPressed: () => Scaffold.of(ctx).openDrawer(),
           ),
         ),
@@ -243,7 +264,7 @@ class _HomeViewState extends State<HomeView> {
           ),
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white, size: 19),
-            tooltip: isEn ? 'Sign Out' : 'Sign Out (लॉगआउट)',
+            tooltip: AppStrings.get('logout', locale: loc),
             onPressed: () async {
               await authVm.signOut();
             },
@@ -251,6 +272,7 @@ class _HomeViewState extends State<HomeView> {
           const SizedBox(width: 4),
         ],
       ),
+      drawer: _buildDrawer(context, authVm, loc),
       body: RefreshIndicator(
         onRefresh: () async {
           await weatherVm.fetchWeather();
@@ -262,19 +284,19 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Farmer Identity & GPS Location Header
-              _buildFarmerHeaderCard(context, authVm, isEn),
+              _buildFarmerHeaderCard(context, authVm, loc),
               const SizedBox(height: 14),
 
               // 2. CORE FEATURE 1: Nearby Mandis & Dedicated Calculator Launcher
-              _buildMandiCalculatorSection(context, mandiVm, isEn),
+              _buildMandiCalculatorSection(context, mandiVm, loc),
               const SizedBox(height: 14),
 
               // 3. CORE FEATURE 2: GPS Location Soil Type & Recommended Suitable Crops
-              _buildSoilDetectionSection(context, soilVm, authVm, isEn),
+              _buildSoilDetectionSection(context, soilVm, authVm, loc),
               const SizedBox(height: 14),
 
               // 4. CORE FEATURE 3: My Crops & AI Future Price Predictor (Hold vs Sell)
-              _buildMyCropsForecastSection(context, soilVm, isEn),
+              _buildMyCropsForecastSection(context, soilVm, loc),
               const SizedBox(height: 14),
 
               // 5. Hyperlocal Weather Spray Window Banner
@@ -283,7 +305,7 @@ class _HomeViewState extends State<HomeView> {
 
               // 6. Quick Agronomic Tools Navigation Grid
               Text(
-                isEn ? 'Agricultural Decision Tools' : (authVm.isHi ? 'कृषि निर्णय उपकरण' : 'शेती निर्णय साधने'),
+                AppStrings.get('agriToolsTitle', locale: loc),
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
@@ -291,7 +313,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
               const SizedBox(height: 8),
-              _buildQuickActionsGrid(context, authVm, isEn),
+              _buildQuickActionsGrid(context, authVm, loc),
               const SizedBox(height: 20),
             ],
           ),
@@ -301,18 +323,19 @@ class _HomeViewState extends State<HomeView> {
   }
 
   // --- 1. FARMER HEADER CARD ---
-  Widget _buildFarmerHeaderCard(BuildContext context, AuthViewModel authVm, bool isEn) {
+  Widget _buildFarmerHeaderCard(BuildContext context, AuthViewModel authVm, String loc) {
     final user = authVm.currentUser;
     final name = (user?.fullName != null && user!.fullName.isNotEmpty)
         ? user.fullName
-        : (isEn ? 'Ramesh Patil (Farmer)' : 'रमेश पाटील (शेतकरी)');
+        : AppStrings.tr(loc, en: 'Ramesh Patil (Farmer)', mr: 'रमेश पाटील (शेतकरी)', hi: 'रमेश पाटिल (किसान)', te: 'రమేష్ పాటిల్ (రైతు)', kn: 'ರಮೇಶ್ ಪಾಟೀಲ್ (ರೈತ)', gu: 'રમેશ પાટીલ (ખેડૂત)');
     final village = (user?.village != null && user!.village!.isNotEmpty)
         ? user.village!
-        : (isEn ? 'Shirol' : 'शिरोळ');
+        : AppStrings.tr(loc, en: 'Shirol', mr: 'शिरोळ', hi: 'शिरोल', te: 'శిరోల్', kn: 'ಶಿರೋಳ', gu: 'શિરોળ');
     final district = (user?.district != null && user!.district!.isNotEmpty)
         ? user.district!
-        : (isEn ? 'Kolhapur' : 'कोल्हापूर');
+        : AppStrings.tr(loc, en: 'Kolhapur', mr: 'कोल्हापूर', hi: 'कोल्हापुर', te: 'కొల్హాపూర్', kn: 'ಕೊಲ್ಹಾಪುರ', gu: 'કોલ્હાપુર');
     final acreage = user?.landSizeAcres ?? 4.5;
+    final crops = user?.preferredCrops ?? ['Soybean', 'Cotton'];
 
     return InkWell(
       onTap: () {
@@ -332,65 +355,108 @@ class _HomeViewState extends State<HomeView> {
             BoxShadow(color: Color(0x06000000), blurRadius: 8, offset: Offset(0, 2)),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CircleAvatar(
-              radius: 22,
-              backgroundColor: AppColors.primaryLight,
-              child: Icon(Icons.person, color: AppColors.primary, size: 26),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            Row(
+              children: [
+                const CircleAvatar(
+                  radius: 22,
+                  backgroundColor: AppColors.primaryLight,
+                  child: Icon(Icons.person, color: AppColors.primary, size: 26),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
-                        child: Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              name,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade50,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: Colors.green.shade200),
+                            ),
+                            child: Text(
+                              AppStrings.get('activeFarmer', locale: loc),
+                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.green),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade50,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Colors.green.shade200),
-                        ),
-                        child: Text(
-                          isEn ? '✓ Active Farmer' : '✓ सक्रिय शेतकरी',
-                          style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.green),
-                        ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '📍 $village, $district • $acreage ${AppStrings.get("acresFarmland", locale: loc)}',
+                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '📍 $village, $district • $acreage ${isEn ? "Acres Farmland" : "एकर शेतजमीन"}',
-                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                ),
+                const SizedBox(width: 4),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.cardBorder),
                   ),
-                ],
-              ),
+                  child: const Icon(Icons.edit_outlined, size: 16, color: AppColors.primary),
+                ),
+              ],
             ),
-            const SizedBox(width: 4),
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.cardBorder),
+            if (crops.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: crops.map((cropId) {
+                    final cropMatch = MandiDirectoryService.crops.firstWhere(
+                      (c) => c.id.toLowerCase() == cropId.toLowerCase() || c.nameEn.toLowerCase() == cropId.toLowerCase(),
+                      orElse: () => CropItem(
+                        id: cropId,
+                        nameEn: cropId,
+                        nameMr: cropId,
+                        nameHi: cropId,
+                        nameTe: cropId,
+                        nameKn: cropId,
+                        nameGu: cropId,
+                        icon: '🌱',
+                        categoryId: 'grains',
+                        benchmarkPrice: 4500,
+                      ),
+                    );
+                    return Container(
+                      margin: const EdgeInsets.only(right: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.cardBorder),
+                      ),
+                      child: Text(
+                        cropMatch.getName(loc),
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
-              child: const Icon(Icons.edit_outlined, size: 16, color: AppColors.primary),
-            ),
+            ],
           ],
         ),
       ),
@@ -401,7 +467,7 @@ class _HomeViewState extends State<HomeView> {
   Widget _buildMandiCalculatorSection(
     BuildContext context,
     MandiViewModel mandiVm,
-    bool isEn,
+    String loc,
   ) {
     final highestMandi = mandiVm.rankings.isNotEmpty
         ? (List<MandiEvaluation>.from(mandiVm.rankings)..sort((a, b) => b.quotedGrossRate.compareTo(a.quotedGrossRate))).first
@@ -429,7 +495,7 @@ class _HomeViewState extends State<HomeView> {
                   const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 20),
                   const SizedBox(width: 6),
                   Text(
-                    isEn ? 'Nearby Mandis & Live Market Rates' : 'नजीकच्या बाजारपेठा व नफा तुलना',
+                    AppStrings.get('nearbyMandisTitle', locale: loc),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
@@ -444,18 +510,16 @@ class _HomeViewState extends State<HomeView> {
                   color: AppColors.primaryLight,
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text(
-                  'APMC Live',
-                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primary),
+                child: Text(
+                  '📍 ${mandiVm.selectedCity.getName(loc)}',
+                  style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primary),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 4),
           Text(
-            isEn
-                ? 'Select crop ➔ View live rates ➔ Calculate transport & true net profit'
-                : '१. पीक निवडा ➔ २. थेट दर पाहा ➔ वाहतूक खर्च व निव्वळ नफा कॅल्क्युलेट करा',
+            AppStrings.get('nearbyMandisSub', locale: loc),
             style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 12),
@@ -465,13 +529,16 @@ class _HomeViewState extends State<HomeView> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: _commodities.map((comm) {
-                final isSelected = mandiVm.selectedCommodity == comm;
-                final label = isEn ? (_commodityLabelsEn[comm] ?? comm) : (_commodityLabelsMr[comm] ?? comm);
+                final isSelected = mandiVm.selectedCommodity.toLowerCase() == comm.toLowerCase();
+                final cropMatch = MandiDirectoryService.crops.firstWhere(
+                  (c) => c.id.toLowerCase() == comm.toLowerCase(),
+                  orElse: () => MandiDirectoryService.crops.first,
+                );
                 return Padding(
                   padding: const EdgeInsets.only(right: 6),
                   child: ChoiceChip(
                     label: Text(
-                      label,
+                      cropMatch.getName(loc),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -517,7 +584,17 @@ class _HomeViewState extends State<HomeView> {
                       text: TextSpan(
                         style: const TextStyle(fontSize: 11, color: Colors.brown),
                         children: [
-                          TextSpan(text: isEn ? 'Highest Price for this crop: ' : 'या पिकासाठी सर्वोच्च भाव: '),
+                          TextSpan(
+                            text: AppStrings.tr(
+                              loc,
+                              en: 'Highest Price: ',
+                              mr: 'या पिकासाठी सर्वोच्च भाव: ',
+                              hi: 'सर्वोच्च भाव: ',
+                              te: 'అత్యధిక ధర: ',
+                              kn: 'ಅತ್ಯಧಿಕ ದರ: ',
+                              gu: 'સર્વોચ્ચ ભાવ: ',
+                            ),
+                          ),
                           TextSpan(
                             text: '${highestMandi.mandiName} ',
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -584,9 +661,7 @@ class _HomeViewState extends State<HomeView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isEn
-                              ? 'Calculate Transport & True Profit'
-                              : 'वाहतूक खर्च व निव्वळ नफा कॅल्क्युलेटर',
+                          AppStrings.get('calcTransportBtn', locale: loc),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 13,
@@ -595,9 +670,7 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          isEn
-                              ? 'Enter quantity ➔ Auto-select vehicle ➔ Compare in-hand cash'
-                              : 'वजन टाका ➔ वाहन आपोआप निवडले जाईल ➔ खरा नफा पाहा',
+                          AppStrings.get('calcTransportSub', locale: loc),
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.85),
                             fontSize: 10,
@@ -618,7 +691,15 @@ class _HomeViewState extends State<HomeView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                isEn ? 'Top Mandis Overview:' : 'प्रमुख बाजारपेठा (थेट दर):',
+                AppStrings.tr(
+                  loc,
+                  en: 'Top Mandis Overview:',
+                  mr: 'प्रमुख बाजारपेठा (थेट दर):',
+                  hi: 'प्रमुख मंडियां (लाइव भाव):',
+                  te: 'ప్రధాన మార్కెట్లు (ప్రత్యక్ష ధరలు):',
+                  kn: 'ಪ್ರಮುಖ ಮಾರುಕಟ್ಟೆಗಳು (ನೇರ ದರ):',
+                  gu: 'મુખ્ય બજારો (લાઈવ ભાવ):',
+                ),
                 style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
               ),
               InkWell(
@@ -633,7 +714,15 @@ class _HomeViewState extends State<HomeView> {
                   );
                 },
                 child: Text(
-                  isEn ? 'Open Full Calculator ➔' : 'संपूर्ण कॅल्क्युलेटर उघडा ➔',
+                  AppStrings.tr(
+                    loc,
+                    en: 'Open Full Calculator ➔',
+                    mr: 'संपूर्ण कॅल्क्युलेटर उघडा ➔',
+                    hi: 'पूरा कैलकुलेटर खोलें ➔',
+                    te: 'పూర్తి కాలిక్యులేటర్ తెరవండి ➔',
+                    kn: 'ಪೂರ್ಣ ಕ್ಯಾಲ್ಕುಲೇಟರ್ ತೆರೆಯಿರಿ ➔',
+                    gu: 'સંપૂર્ણ કેલ્ક્યુલેટર ખોલો ➔',
+                  ),
                   style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary),
                 ),
               ),
@@ -712,7 +801,15 @@ class _HomeViewState extends State<HomeView> {
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
-                                    isEn ? '🏆 Top Profit' : '🏆 सर्वाधिक नफा',
+                                    AppStrings.tr(
+                                      loc,
+                                      en: '🏆 Top Profit',
+                                      mr: '🏆 सर्वाधिक नफा',
+                                      hi: '🏆 सर्वाधिक लाभ',
+                                      te: '🏆 గరిష్ట లాభం',
+                                      kn: '🏆 ಗರಿಷ್ಠ ಲಾಭ',
+                                      gu: '🏆 મહત્તમ નફો',
+                                    ),
                                     style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -720,7 +817,7 @@ class _HomeViewState extends State<HomeView> {
                             ],
                           ),
                           Text(
-                            '${eval.distanceKm} km • ${isEn ? "Quoted Rate:" : "बाजार भाव:"} ₹${eval.quotedGrossRate.toStringAsFixed(0)}/Qtl',
+                            '${eval.distanceKm} km • ${AppStrings.tr(loc, en: "Quoted Rate:", mr: "बाजार भाव:", hi: "मंडी भाव:", te: "మార్కెట్ రేటు:", kn: "ಮಾರುಕಟ್ಟೆ ದರ:", gu: "બજાર ભાવ:")} ₹${eval.quotedGrossRate.toStringAsFixed(0)}/Qtl',
                             style: const TextStyle(fontSize: 9, color: AppColors.textMuted),
                           ),
                         ],
@@ -738,7 +835,7 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         ),
                         Text(
-                          isEn ? 'per Quintal' : 'प्रति क्विंटल',
+                          AppStrings.tr(loc, en: 'per Qtl', mr: 'प्रति क्विंटल', hi: 'प्रति क्विंटल', te: 'క్వింటాల్‌కు', kn: 'ಪ್ರತಿ ಕ್ವಿಂಟಾಲ್‌ಗೆ', gu: 'પ્રતિ ક્વિન્ટલ'),
                           style: const TextStyle(fontSize: 8, color: AppColors.textMuted),
                         ),
                       ],
@@ -758,9 +855,10 @@ class _HomeViewState extends State<HomeView> {
     BuildContext context,
     SoilViewModel soilVm,
     AuthViewModel authVm,
-    bool isEn,
+    String loc,
   ) {
     final soil = soilVm.detectedSoil;
+    final isMr = loc == 'mr';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -783,7 +881,7 @@ class _HomeViewState extends State<HomeView> {
                   const Icon(Icons.landscape_rounded, color: Colors.brown, size: 20),
                   const SizedBox(width: 6),
                   Text(
-                    isEn ? 'Local Soil Type & Suitable Crops' : 'स्थानिक माती प्रकार व योग्य पिके',
+                    AppStrings.get('localSoilTitle', locale: loc),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
@@ -808,7 +906,7 @@ class _HomeViewState extends State<HomeView> {
           ),
           const SizedBox(height: 4),
           Text(
-            '${isEn ? "Location:" : "स्थान:"} ${soil.getLocation(isEn)}',
+            '${AppStrings.tr(loc, en: "Location:", mr: "स्थान:", hi: "स्थान:", te: "ప్రాంతం:", kn: "ಸ್ಥಳ:", gu: "સ્થળ:")} ${soil.getLocation(!isMr)}',
             style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 10),
@@ -830,7 +928,7 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     Expanded(
                       child: Text(
-                        soil.getSoilName(isEn),
+                        soil.getSoilName(!isMr),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w900,
@@ -856,7 +954,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${isEn ? "Organic Carbon:" : "सेंद्रिय कर्ब:"} ${soil.getOrganicCarbon(isEn)} • ${isEn ? "Moisture Retention:" : "ओलावा धारणा:"} ${soil.getWaterRetention(isEn)}',
+                  '${AppStrings.tr(loc, en: "Organic Carbon:", mr: "सेंद्रिय कर्ब:", hi: "जैविक कार्बन:", te: "సేంద్రీయ కార్బన్:", kn: "ಸಾವಯವ ಇಂಗಾಲ:", gu: "જૈવિક કાર્બન:")} ${soil.getOrganicCarbon(!isMr)} • ${AppStrings.tr(loc, en: "Moisture Retention:", mr: "ओलावा धारणा:", hi: "नमी धारण:", te: "తేమ నిలుపుదల:", kn: "ತೇವಾಂಶ ಧಾರಣೆ:", gu: "ભેજ સંગ્રહ:")} ${soil.getWaterRetention(!isMr)}',
                   style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 10),
                 ),
               ],
@@ -866,7 +964,15 @@ class _HomeViewState extends State<HomeView> {
 
           // Recommended Suitable Crops
           Text(
-            isEn ? 'Recommended Suitable Crops for this Soil:' : 'या जमिनीसाठी सर्वाधिक अनुकूल पिके (Suitable Crops):',
+            AppStrings.tr(
+              loc,
+              en: 'Recommended Suitable Crops for this Soil:',
+              mr: 'या जमिनीसाठी सर्वाधिक अनुकूल पिके (Suitable Crops):',
+              hi: 'इस मिट्टी के लिए उपयुक्त अनुशंसित फसलें:',
+              te: 'ఈ నేలకు సిఫార్సు చేయబడిన అనుకూల పంటలు:',
+              kn: 'ಈ ಮಣ್ಣಿಗೆ ಶಿಫಾರಸು ಮಾಡಲಾದ ಸೂಕ್ತ ಬೆಳೆಗಳು:',
+              gu: 'આ જમીન માટે ભલામણ કરેલ યોગ્ય પાક:',
+            ),
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
           ),
           const SizedBox(height: 8),
@@ -893,7 +999,7 @@ class _HomeViewState extends State<HomeView> {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              crop.getName(isEn).split(' ').first,
+                              crop.getName(!isMr).split(' ').first,
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -903,12 +1009,12 @@ class _HomeViewState extends State<HomeView> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        crop.getYield(isEn),
+                        crop.getYield(!isMr),
                         style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.primary),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        crop.getReason(isEn),
+                        crop.getReason(!isMr),
                         style: const TextStyle(fontSize: 9, color: AppColors.textMuted),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -934,7 +1040,7 @@ class _HomeViewState extends State<HomeView> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    soil.getTip(isEn),
+                    soil.getTip(!isMr),
                     style: const TextStyle(fontSize: 10, color: AppColors.textPrimary),
                   ),
                 ),
@@ -947,9 +1053,10 @@ class _HomeViewState extends State<HomeView> {
   }
 
   // --- 4. MY CROPS & FUTURE PRICE PREDICTOR SECTION (HOLD VS SELL) ---
-  Widget _buildMyCropsForecastSection(BuildContext context, SoilViewModel soilVm, bool isEn) {
+  Widget _buildMyCropsForecastSection(BuildContext context, SoilViewModel soilVm, String loc) {
     final tracker = soilVm.cropTracker;
     final forecast = soilVm.priceForecast;
+    final isMr = loc == 'mr';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -972,7 +1079,7 @@ class _HomeViewState extends State<HomeView> {
                   const Icon(Icons.auto_graph_rounded, color: Colors.deepPurple, size: 20),
                   const SizedBox(width: 6),
                   Text(
-                    isEn ? 'My Standing Crops & AI Price Forecast' : 'माझी पिके व AI बाजारभाव अंदाज',
+                    AppStrings.get('myCropsForecastTitle', locale: loc),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
@@ -982,7 +1089,7 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
               InkWell(
-                onTap: () => _showEditCropTrackerDialog(context, soilVm, isEn),
+                onTap: () => _showEditCropTrackerDialog(context, soilVm, loc),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
@@ -995,7 +1102,7 @@ class _HomeViewState extends State<HomeView> {
                       const Icon(Icons.edit, size: 10, color: Colors.deepPurple),
                       const SizedBox(width: 2),
                       Text(
-                        isEn ? 'Edit' : 'बदला',
+                        AppStrings.tr(loc, en: 'Edit', mr: 'बदला', hi: 'बदलें', te: 'సవరించు', kn: 'ಬದಲಾಯಿಸಿ', gu: 'બદલો'),
                         style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.deepPurple),
                       ),
                     ],
@@ -1020,11 +1127,11 @@ class _HomeViewState extends State<HomeView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isEn ? 'Standing Crop:' : 'सध्याचे पीक:',
+                        AppStrings.get('standingCrop', locale: loc),
                         style: const TextStyle(fontSize: 9, color: AppColors.textMuted),
                       ),
                       Text(
-                        tracker.getGrowingCrop(isEn),
+                        tracker.getGrowingCrop(!isMr),
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1045,11 +1152,11 @@ class _HomeViewState extends State<HomeView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isEn ? 'Stored Stock:' : 'शिल्लक साठा (Stock):',
+                        AppStrings.get('storedStock', locale: loc),
                         style: const TextStyle(fontSize: 9, color: AppColors.textMuted),
                       ),
                       Text(
-                        '${tracker.storedStockQuintals.toStringAsFixed(0)} ${isEn ? "Quintals" : "क्विंटल"}',
+                        '${tracker.storedStockQuintals.toStringAsFixed(0)} ${AppStrings.tr(loc, en: "Qtl", mr: "क्विंटल", hi: "क्विंटल", te: "క్వింటాళ్ళు", kn: "ಕ್ವಿಂಟಾಲ್", gu: "ક્વિન્ટલ")}',
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
                       ),
                     ],
@@ -1077,7 +1184,7 @@ class _HomeViewState extends State<HomeView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      forecast.getVerdictBadge(isEn),
+                      forecast.getVerdictBadge(!isMr),
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
@@ -1091,7 +1198,7 @@ class _HomeViewState extends State<HomeView> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        '${forecast.confidencePercent}% ${isEn ? "Accuracy" : "अचूकता"}',
+                        '${forecast.confidencePercent}% ${AppStrings.tr(loc, en: "Accuracy", mr: "अचूकता", hi: "सटीकता", te: "ఖచ్చితత్వం", kn: "ನಿಖರತೆ", gu: "ચોકસાઈ")}',
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
@@ -1110,7 +1217,7 @@ class _HomeViewState extends State<HomeView> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(isEn ? "Today's Price" : 'आजचा भाव', style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                        Text(AppStrings.get('todayPrice', locale: loc), style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
                         Text(
                           '₹${forecast.currentPrice.toStringAsFixed(0)}',
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
@@ -1126,7 +1233,7 @@ class _HomeViewState extends State<HomeView> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          isEn ? 'Forecast (${forecast.daysAhead} days)' : 'भाकीत भाव (${forecast.daysAhead} दिवस)',
+                          '${AppStrings.get("projectedPrice", locale: loc)} (${forecast.daysAhead} ${AppStrings.tr(loc, en: "days", mr: "दिवस", hi: "दिन", te: "రోజులు", kn: "ದಿನಗಳು", gu: "દિવસ")})',
                           style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
                         ),
                         Text(
@@ -1153,9 +1260,15 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     child: Center(
                       child: Text(
-                        isEn
-                            ? '💰 Holding Stock Net Gain: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)} Extra'
-                            : '💰 साठवून ठेवल्यास संभाव्य नफा: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)} अतिरिक्त',
+                        AppStrings.tr(
+                          loc,
+                          en: '💰 Holding Stock Net Gain: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)} Extra',
+                          mr: '💰 साठवून ठेवल्यास संभाव्य नफा: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)} अतिरिक्त',
+                          hi: '💰 रोककर रखने पर संभावित शुद्ध लाभ: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)} अतिरिक्त',
+                          te: '💰 నిల్వ ఉంచితే అదనపు లాభం: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)}',
+                          kn: '💰 ದಾಸ್ತಾನು ಇಟ್ಟರೆ ಹೆಚ್ಚುವರಿ ಲಾಭ: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)}',
+                          gu: '💰 સ્ટોક રાખવાથી વધારાનો નફો: +₹${forecast.potentialExtraProfit.toStringAsFixed(0)}',
+                        ),
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w900,
@@ -1168,7 +1281,7 @@ class _HomeViewState extends State<HomeView> {
                 ],
 
                 Text(
-                  forecast.getAdvisory(isEn),
+                  forecast.getAdvisory(!isMr),
                   style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                 ),
               ],
@@ -1245,8 +1358,8 @@ class _HomeViewState extends State<HomeView> {
           Text(
             weatherVm.weatherReport?.actionAdvisory ??
                 (isSafe
-                    ? 'Safe to spray. Low wind and zero wash-off risk predicted.'
-                    : 'DO NOT SPRAY: Rain wash-off or high wind drift detected.'),
+                    ? AppStrings.tr(loc, en: 'Safe to spray. Low wind and zero wash-off risk predicted.', mr: 'फवारणीसाठी सुरक्षित हवामान. वारा शांत व पावसाचा धोका नाही.', hi: 'छिड़काव के लिए सुरक्षित मौसम। कम हवा और बारिश का कोई खतरा नहीं।', te: 'స్ప్రే చేయడానికి అనుకూలమైన వాతావరణం.', kn: 'ಸಿಂಪಡಿಸಲು ಸುರಕ್ಷಿತ ವಾತಾವರಣ.', gu: 'છંટકાવ માટે સુરક્ષિત હવામાન.')
+                    : AppStrings.tr(loc, en: 'DO NOT SPRAY: Rain wash-off or high wind drift detected.', mr: 'आत्ता फवारणी करू नका: पाऊस किंवा जोरदार वाऱ्याचा धोका आहे.', hi: 'अभी छिड़काव न करें: बारिश या तेज हवा का जोखिम है।', te: 'ఇప్పుడు స్ప్రే చేయవద్దు: వర్షం లేదా గాలి ప్రమాదం ఉంది.', kn: 'ಈಗ ಸಿಂಪಡಿಸಬೇಡಿ: ಮಳೆ ಅಥವಾ ಬಲವಾದ ಗಾಳಿಯ ಅಪಾಯವಿದೆ.', gu: 'હમણાં છંટકાવ ન કરો: વરસાદ અથવા ભારે પવનનું જોખમ છે.')),
             style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
           ),
         ],
@@ -1255,7 +1368,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   // --- 6. QUICK ACTIONS GRID ---
-  Widget _buildQuickActionsGrid(BuildContext context, AuthViewModel authVm, bool isEn) {
+  Widget _buildQuickActionsGrid(BuildContext context, AuthViewModel authVm, String loc) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -1268,8 +1381,8 @@ class _HomeViewState extends State<HomeView> {
           context,
           icon: Icons.account_balance_rounded,
           color: Colors.purple.shade700,
-          title: isEn ? 'Govt Schemes DBT' : 'शासकीय योजना व अनुदान',
-          subtitle: isEn ? 'Solar Pump & Drip Subsidy' : 'सौर पंप, ठिबक व विमा',
+          title: AppStrings.get('govtSchemes', locale: loc),
+          subtitle: AppStrings.tr(loc, en: 'Solar Pump & Drip Subsidy', mr: 'सौर पंप, ठिबक व विमा', hi: 'सोलर पंप एवं ड्रिप सब्सिडी', te: 'సోలార్ పంప్ & డ్రిప్ సబ్సిడీ', kn: 'ಸೌರ ಪಂಪ್ ಮತ್ತು ಹನಿ ನೀರಾವರಿ ಸಬ್ಸಿಡಿ', gu: 'સોલર પંપ અને ટપક સબસિડી'),
           onTap: () {
             Navigator.push(
               context,
@@ -1281,8 +1394,8 @@ class _HomeViewState extends State<HomeView> {
           context,
           icon: Icons.account_balance_wallet_rounded,
           color: const Color(0xFF165B33),
-          title: isEn ? 'Farm Khata Ledger' : 'शेतकरी नफा-तोटा वही',
-          subtitle: isEn ? 'Crop Expenses & P&L' : 'खर्च, विक्री व ROI',
+          title: AppStrings.get('farmKhata', locale: loc),
+          subtitle: AppStrings.tr(loc, en: 'Crop Expenses & P&L', mr: 'खर्च, विक्री व ROI', hi: 'खर्च, बिक्री एवं मुनाफा', te: 'ఖర్చులు, అమ్మకాలు & లాభం', kn: 'ವೆಚ್ಚಗಳು, ಮಾರಾಟ ಮತ್ತು ಲಾಭ', gu: 'ખર્ચ, વેચાણ અને નફો'),
           onTap: () {
             Navigator.push(
               context,
@@ -1294,8 +1407,8 @@ class _HomeViewState extends State<HomeView> {
           context,
           icon: Icons.grass_rounded,
           color: Colors.amber.shade900,
-          title: isEn ? 'Intercropping Planner' : 'आंतरपीक व फेरपालट',
-          subtitle: isEn ? 'Row Pattern & Yield' : '४:२ प्रमाण व खत बचत',
+          title: AppStrings.get('intercropping', locale: loc),
+          subtitle: AppStrings.tr(loc, en: 'Row Pattern & Yield', mr: '४:२ प्रमाण व खत बचत', hi: '४:२ पंक्ति अनुपात एवं खाद बचत', te: 'వరుసల విధానం & దిగుబడి', kn: 'ಸಾಲು ಮಾದರಿ ಮತ್ತು ಇಳುವರಿ', gu: 'રો પદ્ધતિ અને ઉપજ'),
           onTap: () {
             Navigator.push(
               context,
@@ -1307,8 +1420,8 @@ class _HomeViewState extends State<HomeView> {
           context,
           icon: Icons.science_outlined,
           color: Colors.teal,
-          title: isEn ? 'Soil Health & NPK' : 'माती परीक्षण सल्ला',
-          subtitle: isEn ? 'ICAR Fertilizer Dosage' : 'ICAR खत मात्रा',
+          title: AppStrings.get('soilAdvisory', locale: loc),
+          subtitle: AppStrings.tr(loc, en: 'ICAR Fertilizer Dosage', mr: 'ICAR खत मात्रा', hi: 'ICAR खाद मात्रा', te: 'ICAR ఎరువుల మోతాదు', kn: 'ICAR ರಸಗೊಬ್ಬರ ಪ್ರಮಾಣ', gu: 'ICAR ખાતર માત્રા'),
           onTap: () {
             Navigator.push(
               context,
@@ -1320,8 +1433,8 @@ class _HomeViewState extends State<HomeView> {
           context,
           icon: Icons.shopping_bag_outlined,
           color: Colors.indigo,
-          title: isEn ? 'Agri Input Store' : 'कृषी इनपुट स्टोअर',
-          subtitle: isEn ? 'Fertilizers & Direct Seeds' : 'खते, बियाणे, औषधे',
+          title: AppStrings.get('agriStore', locale: loc),
+          subtitle: AppStrings.tr(loc, en: 'Fertilizers & Direct Seeds', mr: 'खते, बियाणे, औषधे', hi: 'खाद, बीज एवं कीटनाशक', te: 'ఎరువులు, విత్తనాలు & మందులు', kn: 'ಗೊಬ್ಬರ, ಬೀಜಗಳು ಮತ್ತು ಔಷಧಗಳು', gu: 'ખાતર, બિયારણ અને દવાઓ'),
           onTap: () {
             Navigator.push(
               context,
@@ -1375,6 +1488,116 @@ class _HomeViewState extends State<HomeView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // --- 7. NAVIGATION DRAWER ---
+  Widget _buildDrawer(BuildContext context, AuthViewModel authVm, String loc) {
+    final user = authVm.currentUser;
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF165B33), Color(0xFF10B981)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            accountName: Text(
+              user?.fullName ?? 'AgriPulse Farmer',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            accountEmail: Text(
+              '${user?.village ?? "Village"}, ${user?.district ?? "District"} • ${user?.landSizeAcres ?? 4.5} Acres',
+              style: const TextStyle(fontSize: 12),
+            ),
+            currentAccountPicture: const CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(Icons.agriculture_rounded, color: AppColors.primary, size: 36),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person_rounded, color: AppColors.primary),
+            title: Text(AppStrings.get('navProfile', locale: loc)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileView()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.calculate_rounded, color: AppColors.primary),
+            title: Text(AppStrings.get('calcTransportBtn', locale: loc)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const MandiProfitCalculatorView()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.account_balance_rounded, color: Colors.purple),
+            title: Text(AppStrings.get('govtSchemes', locale: loc)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const SchemesView()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF165B33)),
+            title: Text(AppStrings.get('farmKhata', locale: loc)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmKhataView()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.grass_rounded, color: Colors.amber),
+            title: Text(AppStrings.get('intercropping', locale: loc)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const IntercroppingView()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.science_outlined, color: Colors.teal),
+            title: Text(AppStrings.get('soilAdvisory', locale: loc)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const SoilAdvisoryView()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.shopping_bag_outlined, color: Colors.indigo),
+            title: Text(AppStrings.get('agriStore', locale: loc)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const StoreView()));
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.language_rounded, color: Colors.blueGrey),
+            title: Text(AppStrings.get('language', locale: loc)),
+            trailing: Text(
+              SupportedLanguages.findByCode(loc).nativeName,
+              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const LanguageSelectionView(isFirstTime: false)));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout_rounded, color: Colors.red),
+            title: Text(AppStrings.get('logout', locale: loc), style: const TextStyle(color: Colors.red)),
+            onTap: () async {
+              Navigator.pop(context);
+              await authVm.signOut();
+            },
+          ),
+        ],
       ),
     );
   }

@@ -7,6 +7,7 @@ import '../../constants/supported_languages.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../main_nav_scaffold.dart';
 import '../language/language_selection_view.dart';
+import 'farmer_onboarding_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -114,10 +115,18 @@ class _LoginViewState extends State<LoginView> {
   }
 
   void _onSuccess(BuildContext context) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const MainNavScaffold()),
-    );
+    final authVm = context.read<AuthViewModel>();
+    if (!authVm.hasCompletedOnboarding) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const FarmerOnboardingView()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MainNavScaffold()),
+      );
+    }
   }
 
   void _autofillDummyOtp() {
@@ -239,7 +248,7 @@ class _LoginViewState extends State<LoginView> {
                 // Brand Emblem
                 Container(
                   padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.primaryLight,
                     shape: BoxShape.circle,
                   ),

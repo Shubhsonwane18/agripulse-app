@@ -3,7 +3,7 @@ class UserProfile {
   final String fullName;
   final String? phone;
   final String? email;
-  final String language; // 'en' | 'mr' | 'hi'
+  final String language; // 'en' | 'mr' | 'hi' | 'te' | 'kn' | 'gu'
   final String? state;
   final String? district;
   final String? village;
@@ -11,6 +11,8 @@ class UserProfile {
   final double latitude;
   final double longitude;
   final bool isDemo;
+  final List<String> preferredCrops;
+  final bool hasCompletedOnboarding;
 
   UserProfile({
     required this.id,
@@ -25,9 +27,11 @@ class UserProfile {
     this.latitude = 16.7050,
     this.longitude = 74.2433,
     this.isDemo = false,
+    this.preferredCrops = const ['Soybean', 'Cotton'],
+    this.hasCompletedOnboarding = false,
   });
 
-  // Default Demo Farmer Profile (identical to web DEFAULT_DEMO_PROFILE)
+  // Default Demo Farmer Profile
   factory UserProfile.defaultDemo() {
     return UserProfile(
       id: 'demo-farmer-id-789',
@@ -42,10 +46,19 @@ class UserProfile {
       latitude: 16.7050,
       longitude: 74.2433,
       isDemo: true,
+      preferredCrops: const ['Soybean', 'Cotton', 'Sugarcane'],
+      hasCompletedOnboarding: false,
     );
   }
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
+    List<String> crops = const ['Soybean', 'Cotton'];
+    if (json['preferred_crops'] is List) {
+      crops = (json['preferred_crops'] as List).map((e) => e.toString()).toList();
+    } else if (json['preferredCrops'] is List) {
+      crops = (json['preferredCrops'] as List).map((e) => e.toString()).toList();
+    }
+
     return UserProfile(
       id: json['id']?.toString() ?? '',
       fullName: json['full_name']?.toString() ?? json['fullName']?.toString() ?? '',
@@ -59,6 +72,8 @@ class UserProfile {
       latitude: (json['latitude'] ?? 16.7050).toDouble(),
       longitude: (json['longitude'] ?? 74.2433).toDouble(),
       isDemo: json['is_demo'] == true || json['isDemo'] == true,
+      preferredCrops: crops,
+      hasCompletedOnboarding: json['has_completed_onboarding'] == true || json['hasCompletedOnboarding'] == true,
     );
   }
 
@@ -76,6 +91,8 @@ class UserProfile {
       'latitude': latitude,
       'longitude': longitude,
       'is_demo': isDemo,
+      'preferred_crops': preferredCrops,
+      'has_completed_onboarding': hasCompletedOnboarding,
     };
   }
 
@@ -91,6 +108,8 @@ class UserProfile {
     double? latitude,
     double? longitude,
     bool? isDemo,
+    List<String>? preferredCrops,
+    bool? hasCompletedOnboarding,
   }) {
     return UserProfile(
       id: id,
@@ -105,6 +124,8 @@ class UserProfile {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       isDemo: isDemo ?? this.isDemo,
+      preferredCrops: preferredCrops ?? this.preferredCrops,
+      hasCompletedOnboarding: hasCompletedOnboarding ?? this.hasCompletedOnboarding,
     );
   }
 }

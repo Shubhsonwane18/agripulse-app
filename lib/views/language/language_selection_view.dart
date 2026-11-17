@@ -83,7 +83,7 @@ class _LanguageSelectionViewState extends State<LanguageSelectionView> {
                   // App Emblem
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.primaryLight,
                       shape: BoxShape.circle,
                     ),

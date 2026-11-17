@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../viewmodels/intercropping_viewmodel.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 
@@ -11,22 +12,22 @@ class IntercroppingView extends StatelessWidget {
   Widget build(BuildContext context) {
     final intercropVm = context.watch<IntercroppingViewModel>();
     final authVm = context.watch<AuthViewModel>();
-
-    final isEn = authVm.isEn;
+    final loc = authVm.locale;
+    final isMr = loc == 'mr';
 
     final crops = [
-      {'id': 'all', 'label': isEn ? 'All Intercrops' : 'सर्व आंतरपिके (All)'},
-      {'id': 'सोयाबीन', 'label': isEn ? '🌱 Soybean' : '🌱 सोयाबीन'},
-      {'id': 'कापूस', 'label': isEn ? '☁️ Cotton' : '☁️ कापूस'},
-      {'id': 'ऊस', 'label': isEn ? '🎋 Sugarcane' : '🎋 ऊस'},
-      {'id': 'मका', 'label': isEn ? '🌽 Maize' : '🌽 मका'},
+      {'id': 'all', 'label': AppStrings.tr(loc, en: 'All Intercrops', mr: 'सर्व आंतरपिके', hi: 'सभी अंतर्फसलें', te: 'అన్ని అంతరపంటలు', kn: 'ಎಲ್ಲಾ ಮಿಶ್ರಬೆಳೆಗಳು', gu: 'તમામ આંતરપાક')},
+      {'id': 'सोयाबीन', 'label': AppStrings.tr(loc, en: '🌱 Soybean', mr: '🌱 सोयाबीन', hi: '🌱 सोयाबीन', te: '🌱 సోయాబీన్', kn: '🌱 ಸೋಯಾಬೀನ್', gu: '🌱 સોયાબીન')},
+      {'id': 'कापूस', 'label': AppStrings.tr(loc, en: '☁️ Cotton', mr: '☁️ कापूस', hi: '☁️ कपास', te: '☁️ పత్తి', kn: '☁️ ಹತ್ತಿ', gu: '☁️ કપાસ')},
+      {'id': 'ऊस', 'label': AppStrings.tr(loc, en: '🎋 Sugarcane', mr: '🎋 ऊस', hi: '🎋 गन्ना', te: '🎋 చెరకు', kn: '🎋 ಕಬ್ಬು', gu: '🎋 શેરડી')},
+      {'id': 'मका', 'label': AppStrings.tr(loc, en: '🌽 Maize', mr: '🌽 मका', hi: '🌽 मक्का', te: '🌽 మొక్కజొన్న', kn: '🌽 ಜೋಳ', gu: '🌽 મકાઈ')},
     ];
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
-          isEn ? 'Intercropping & Crop Rotation Planner' : 'आंतरपीक व फेरपालट मार्गदर्शक',
+          AppStrings.get('intercropping', locale: loc),
           style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
         ),
       ),
@@ -55,16 +56,30 @@ class IntercroppingView extends StatelessWidget {
                       const Icon(Icons.workspace_premium, color: Colors.amber, size: 20),
                       const SizedBox(width: 6),
                       Text(
-                        isEn ? 'Guaranteed Profit & Fertilizer Savings' : 'दुहेरी नफा व खत बचत हमी',
+                        AppStrings.tr(
+                          loc,
+                          en: 'Guaranteed Profit & Fertilizer Savings',
+                          mr: 'दुहेरी नफा व खत बचत हमी',
+                          hi: 'दोहरा मुनाफा एवं खाद बचत गारंटी',
+                          te: 'రెట్టింపు లాభం & ఎరువుల ఆదా హామీ',
+                          kn: 'ದ್ವಿಗುಣ ಲಾಭ ಮತ್ತು ಗೊಬ್ಬರ ಉಳಿತಾಯ ಖಾತರಿ',
+                          gu: 'બમણો નફો અને ખાતર બચત ગેરંટી',
+                        ),
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    isEn
-                        ? 'Intercropping enriches soil nitrogen, saves 30% fertilizer expense, and yields ₹18,000 to ₹40,000 extra profit per acre.'
-                        : 'आंतरपिकामुळे जमिनीतील नत्र वाढते, खताचा खर्च ३०% वाचतो आणि एकरी ₹१८,००० ते ₹४०,००० अतिरिक्त नफा मिळतो.',
+                    AppStrings.tr(
+                      loc,
+                      en: 'Intercropping enriches soil nitrogen, saves 30% fertilizer expense, and yields extra profit per acre.',
+                      mr: 'आंतरपिकामुळे जमिनीतील नत्र वाढते, खताचा खर्च ३०% वाचतो आणि एकरी अतिरिक्त नफा मिळतो.',
+                      hi: 'अंतर्फसल से भूमि की उर्वरता बढ़ती है, खाद का खर्च ३०% बचता है और प्रति एकड़ अतिरिक्त लाभ होता है।',
+                      te: 'అంతర పంటల వల్ల నేలలో నత్రజని పెరుగుతుంది, ఎరువుల ఖర్చు 30% ఆదా అవుతుంది.',
+                      kn: 'ಮಿಶ್ರಬೆಳೆಗಳಿಂದ ಮಣ್ಣಿನ ಸಾರಜನಕ ಹೆಚ್ಚುತ್ತದೆ, ಗೊಬ್ಬರದ ವೆಚ್ಚ 30% ಉಳಿತಾಯವಾಗುತ್ತದೆ.',
+                      gu: 'આંતરપાકથી જમીનની ફળદ્રુપતા વધે છે, ખાતરનો ખર્ચ ૩૦% બચે છે.',
+                    ),
                     style: const TextStyle(color: Colors.white, fontSize: 11),
                   ),
                   const SizedBox(height: 10),
@@ -72,7 +87,7 @@ class IntercroppingView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        isEn ? 'Select Farm Acreage:' : 'तुमचे शेतक्षेत्र निवडा:',
+                        AppStrings.tr(loc, en: 'Select Farm Acreage:', mr: 'तुमचे शेतक्षेत्र निवडा:', hi: 'कृषि रकबा चुनें:', te: 'భూమి విస్తీర్ణం ఎంచుకోండి:', kn: 'ಕೃಷಿ ವಿಸ್ತೀರ್ಣ ಆಯ್ಕೆಮಾಡಿ:', gu: 'ખેતીનો વિસ્તાર પસંદ કરો:'),
                         style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                       Row(
@@ -89,7 +104,7 @@ class IntercroppingView extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  '${ac.toStringAsFixed(0)} ${isEn ? "Acres" : "एकर"}',
+                                  '${ac.toStringAsFixed(0)} ${AppStrings.tr(loc, en: "Acres", mr: "एकर", hi: "एकड़", te: "ఎకరాలు", kn: "ಎಕರೆ", gu: "એકર")}',
                                   style: TextStyle(
                                     color: isSel ? AppColors.primary : Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -143,7 +158,15 @@ class IntercroppingView extends StatelessWidget {
 
             // Intercrop Plans List
             Text(
-              authVm.isMr ? 'सर्वोत्कृष्ट शास्त्रोक्त आंतरपीक पद्धती:' : 'Proven Intercrop Patterns:',
+              AppStrings.tr(
+                loc,
+                en: 'Proven Scientific Intercrop Patterns:',
+                mr: 'सर्वोत्कृष्ट शास्त्रोक्त आंतरपीक पद्धती:',
+                hi: 'सर्वोत्तम वैज्ञानिक अंतर्फसल पद्धतियां:',
+                te: 'శాస్త్రీయ అంతరపంటల పద్ధతులు:',
+                kn: 'ಉತ್ತಮ ವೈಜ್ಞಾನಿಕ ಮಿಶ್ರಬೆಳೆ ಮಾದರಿಗಳು:',
+                gu: 'શ્રેષ્ઠ વૈજ્ઞાનિક આંતરપાક પદ્ધતિઓ:',
+              ),
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 8),
@@ -173,7 +196,7 @@ class IntercroppingView extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            isEn ? plan.name : plan.nameMr,
+                            isMr ? plan.nameMr : plan.name,
                             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
                           ),
                         ),
@@ -185,7 +208,7 @@ class IntercroppingView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              isEn ? '⭐ Recommended' : '⭐ शिफारस',
+                              AppStrings.tr(loc, en: '⭐ Recommended', mr: '⭐ शिफारस', hi: '⭐ अनुशंसित', te: '⭐ సిఫార్సు', kn: '⭐ ಶಿಫಾರಸು', gu: '⭐ ભલામણ'),
                               style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -206,7 +229,7 @@ class IntercroppingView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isEn ? 'Field Row Pattern:' : 'ओळींचे प्रत्यक्ष प्रमाण (Field Row Pattern):',
+                            AppStrings.tr(loc, en: 'Field Row Pattern:', mr: 'ओळींचे प्रत्यक्ष प्रमाण (Field Row Pattern):', hi: 'पंक्ति अनुपात (Row Pattern):', te: 'వరుసల విధానం:', kn: 'ಸಾಲು ಮಾದರಿ:', gu: 'હરોળ પદ્ધતિ:'),
                             style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primary),
                           ),
                           const SizedBox(height: 4),
@@ -239,11 +262,11 @@ class IntercroppingView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isEn ? 'Potential Extra Profit for ${intercropVm.farmAcreage.toStringAsFixed(0)} Acres:' : '${intercropVm.farmAcreage.toStringAsFixed(0)} एकरासाठी संभाव्य अतिरिक्त नफा:',
+                                '${intercropVm.farmAcreage.toStringAsFixed(0)} ${AppStrings.tr(loc, en: "Acres Extra Projected Profit:", mr: "एकरासाठी संभाव्य अतिरिक्त नफा:", hi: "एकड़ के लिए अतिरिक्त अनुमानित लाभ:", te: "ఎకరాల అదనపు అంచనా లాభం:", kn: "ಎಕರೆಗೆ ಹೆಚ್ಚುವರಿ ಅಂದಾಜು ಲಾಭ:", gu: "એકર માટે અંદાજિત વધારાનો નફો:")}',
                                 style: const TextStyle(fontSize: 10, color: Colors.green),
                               ),
                               Text(
-                                '+₹${extraTotal.toStringAsFixed(0)} ${isEn ? "Extra Income" : "अतिरिक्त उत्पन्न"}',
+                                '+₹${extraTotal.toStringAsFixed(0)} ${AppStrings.tr(loc, en: "Extra Income", mr: "अतिरिक्त उत्पन्न", hi: "अतिरिक्त आय", te: "అదనపు ఆదాయం", kn: "ಹೆಚ್ಚುವರಿ ಆದಾಯ", gu: "વધારાની આવક")}',
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w900,
@@ -259,7 +282,10 @@ class IntercroppingView extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     // Scientific rationale
-                    Text(isEn ? 'Scientific Soil & Agronomic Benefits:' : 'शास्त्रोक्त फायदे (Scientific Benefits):', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                    Text(
+                      AppStrings.tr(loc, en: 'Scientific Soil & Agronomic Benefits:', mr: 'शास्त्रोक्त फायदे (Scientific Benefits):', hi: 'वैज्ञानिक एवं कृषि लाभ:', te: 'శాస్త్రీయ నేల ప్రయోజనాలు:', kn: 'ವೈಜ್ಞಾನಿಕ ಕೃಷಿ ಪ್ರಯೋಜನಗಳು:', gu: 'વૈજ્ઞાનિક જમીન લાભો:'),
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       plan.scientificRationale,
@@ -295,7 +321,15 @@ class IntercroppingView extends StatelessWidget {
 
             // Scientific Crop Rotation Guide Section
             Text(
-              authVm.isMr ? 'शास्त्रोक्त पीक फेरपालट नियम (Crop Rotation Cycles):' : 'Crop Rotation Rules:',
+              AppStrings.tr(
+                loc,
+                en: 'Scientific Crop Rotation Cycles:',
+                mr: 'शास्त्रोक्त पीक फेरपालट नियम (Crop Rotation Cycles):',
+                hi: 'वैज्ञानिक फसल चक्र नियम (Crop Rotation):',
+                te: 'శాస్త్రీయ పంటల మార్పిడి నియమాలు:',
+                kn: 'ವೈಜ್ಞಾನಿಕ ಬೆಳೆ ಪರಿವರ್ತನೆ ಚಕ್ರ:',
+                gu: 'વૈજ્ઞાનિક પાક ફેરબદલી ચક્ર:',
+              ),
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 8),

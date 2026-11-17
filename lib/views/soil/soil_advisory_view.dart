@@ -13,6 +13,7 @@ class SoilAdvisoryView extends StatelessWidget {
     final authVm = context.watch<AuthViewModel>();
     final soilVm = context.watch<SoilViewModel>();
     final loc = authVm.locale;
+    final isMr = loc == 'mr';
     final res = soilVm.result;
     final input = soilVm.currentInput;
 
@@ -66,14 +67,22 @@ class SoilAdvisoryView extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      res.getSuitability(authVm.isEn),
+                      res.getSuitability(!isMr),
                       style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                     ),
                     const Divider(height: 20),
 
                     // Fertilizer Bags Breakdown
                     Text(
-                      authVm.isEn ? 'Recommended Fertilizer Dosage (Bags Needed):' : 'शिफारस केलेली खतांची मात्रा (Bags Needed):',
+                      AppStrings.tr(
+                        loc,
+                        en: 'Recommended Fertilizer Dosage (Bags Needed):',
+                        mr: 'शिफारस केलेली खतांची मात्रा (Bags Needed):',
+                        hi: 'अनुशंसित खाद की मात्रा (आवश्यक बोरियां):',
+                        te: 'సిఫార్సు చేసిన ఎరువుల మోతాదు (బస్తాలు):',
+                        kn: 'ಶಿಫಾರಸು ಮಾಡಿದ ರಸಗೊಬ್ಬರ ಪ್ರಮಾಣ (ಚೀಲಗಳು):',
+                        gu: 'ભલામણ કરેલ ખાતરની માત્રા (થેલી):',
+                      ),
                       style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
@@ -81,18 +90,18 @@ class SoilAdvisoryView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildFertilizerPill(
-                          authVm.isEn ? 'Urea' : 'युरिया (Urea)',
-                          '${res.ureaBags.toStringAsFixed(1)} ${authVm.isEn ? "Bags" : "गोण्या"}',
+                          AppStrings.tr(loc, en: 'Urea', mr: 'युरिया (Urea)', hi: 'यूरिया', te: 'యూరియా', kn: 'ಯೂರಿಯಾ', gu: 'યુરિયા'),
+                          '${res.ureaBags.toStringAsFixed(1)} ${AppStrings.tr(loc, en: "Bags", mr: "गोण्या", hi: "बोरी", te: "బస్తాలు", kn: "ಚೀಲಗಳು", gu: "થેલી")}',
                           Colors.green,
                         ),
                         _buildFertilizerPill(
-                          authVm.isEn ? 'DAP' : 'डीएपी (DAP)',
-                          '${res.dapBags.toStringAsFixed(1)} ${authVm.isEn ? "Bags" : "गोण्या"}',
+                          AppStrings.tr(loc, en: 'DAP', mr: 'डीएपी (DAP)', hi: 'डीएपी', te: 'డిఎపి', kn: 'ಡಿಎಪಿ', gu: 'ડીએપી'),
+                          '${res.dapBags.toStringAsFixed(1)} ${AppStrings.tr(loc, en: "Bags", mr: "गोण्या", hi: "बोरी", te: "బస్తాలు", kn: "ಚೀಲಗಳು", gu: "થેલી")}',
                           Colors.blue,
                         ),
                         _buildFertilizerPill(
-                          authVm.isEn ? 'MOP (Potash)' : 'एमओपी (MOP)',
-                          '${res.mopBags.toStringAsFixed(1)} ${authVm.isEn ? "Bags" : "गोण्या"}',
+                          AppStrings.tr(loc, en: 'MOP (Potash)', mr: 'एमओपी (Potash)', hi: 'पोटाश (MOP)', te: 'పొటాష్ (MOP)', kn: 'ಪೊಟ್ಯಾಷ್ (MOP)', gu: 'પોટાશ (MOP)'),
+                          '${res.mopBags.toStringAsFixed(1)} ${AppStrings.tr(loc, en: "Bags", mr: "गोण्या", hi: "बोरी", te: "బస్తాలు", kn: "ಚೀಲಗಳು", gu: "થેલી")}',
                           Colors.purple,
                         ),
                       ],
@@ -115,34 +124,42 @@ class SoilAdvisoryView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    authVm.isEn ? 'Soil Lab Test Values (NPK & pH)' : 'माती तपासणी आकडेवारी (Soil Test Values)',
+                    AppStrings.tr(
+                      loc,
+                      en: 'Soil Lab Test Values (NPK & pH)',
+                      mr: 'माती तपासणी आकडेवारी (Soil Test Values)',
+                      hi: 'मिट्टी परीक्षण मान (NPK एवं pH)',
+                      te: 'నేల పరీక్ష విలువలు (NPK & pH)',
+                      kn: 'ಮಣ್ಣು ಪರೀಕ್ಷಾ ಮೌಲ್ಯಗಳು (NPK & pH)',
+                      gu: 'માટી પરીક્ષણ મૂલ્યો (NPK અને pH)',
+                    ),
                     style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 12),
 
                   _buildSlider(
-                    label: authVm.isEn ? 'Nitrogen / N (kg/ha)' : 'नत्र / Nitrogen (kg/ha)',
+                    label: AppStrings.tr(loc, en: 'Nitrogen / N (kg/ha)', mr: 'नत्र / Nitrogen (kg/ha)', hi: 'नाइट्रोजन / N (kg/ha)', te: 'నత్రజని / N (kg/ha)', kn: 'ಸಾರಜನಕ / N (kg/ha)', gu: 'નાઇટ્રોજન / N (kg/ha)'),
                     value: input.nitrogen,
                     min: 100,
                     max: 500,
                     onChanged: (v) => soilVm.updateInputs(nitrogen: v),
                   ),
                   _buildSlider(
-                    label: authVm.isEn ? 'Phosphorus / P (kg/ha)' : 'स्फुरद / Phosphorus (kg/ha)',
+                    label: AppStrings.tr(loc, en: 'Phosphorus / P (kg/ha)', mr: 'स्फुरद / Phosphorus (kg/ha)', hi: 'फास्फोरस / P (kg/ha)', te: 'భాస్వరం / P (kg/ha)', kn: 'ರಂಜಕ / P (kg/ha)', gu: 'ફોસ્ફરસ / P (kg/ha)'),
                     value: input.phosphorus,
                     min: 5,
                     max: 60,
                     onChanged: (v) => soilVm.updateInputs(phosphorus: v),
                   ),
                   _buildSlider(
-                    label: authVm.isEn ? 'Potassium / K (kg/ha)' : 'पालाश / Potassium (kg/ha)',
+                    label: AppStrings.tr(loc, en: 'Potassium / K (kg/ha)', mr: 'पालाश / Potassium (kg/ha)', hi: 'पोटेशियम / K (kg/ha)', te: 'పొటాషియం / K (kg/ha)', kn: 'ಪೊಟ್ಯಾಶಿಯಂ / K (kg/ha)', gu: 'પોટેશિયમ / K (kg/ha)'),
                     value: input.potassium,
                     min: 80,
                     max: 600,
                     onChanged: (v) => soilVm.updateInputs(potassium: v),
                   ),
                   _buildSlider(
-                    label: authVm.isEn ? 'Soil pH Level' : 'सामू / pH Level',
+                    label: AppStrings.tr(loc, en: 'Soil pH Level', mr: 'सामू / pH Level', hi: 'मिट्टी का pH स्तर', te: 'నేల pH స్థాయి', kn: 'ಮಣ್ಣಿನ pH ಮಟ್ಟ', gu: 'જમીનનું pH સ્તર'),
                     value: input.ph,
                     min: 5.0,
                     max: 9.0,
@@ -158,23 +175,20 @@ class SoilAdvisoryView extends StatelessWidget {
   }
 
   Widget _buildFertilizerPill(String name, String bags, MaterialColor color) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: color.shade50,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.shade200),
-          ),
-          child: Text(
-            bags,
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color.shade900),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(name, style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.shade200),
+      ),
+      child: Column(
+        children: [
+          Text(name, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color.shade800)),
+          const SizedBox(height: 2),
+          Text(bags, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color.shade900)),
+        ],
+      ),
     );
   }
 
@@ -191,7 +205,7 @@ class SoilAdvisoryView extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+            Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
             Text(value.toStringAsFixed(1), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary)),
           ],
         ),
@@ -200,6 +214,7 @@ class SoilAdvisoryView extends StatelessWidget {
           min: min,
           max: max,
           activeColor: AppColors.primary,
+          inactiveColor: AppColors.primaryLight,
           onChanged: onChanged,
         ),
       ],

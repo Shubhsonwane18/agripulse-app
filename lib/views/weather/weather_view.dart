@@ -31,7 +31,7 @@ class WeatherView extends StatelessWidget {
             ),
             Text(
               weatherVm.currentLocationName,
-              style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 11),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 11),
             ),
           ],
         ),

@@ -9,6 +9,7 @@ class AuthViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String _locale = 'mr'; // Default Marathi for regional farmers
   bool _hasSelectedLanguage = false;
+  bool _hasCompletedOnboarding = false;
   String? _errorMessage;
 
   AuthViewModel({AuthService? authService})
@@ -21,16 +22,22 @@ class AuthViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get locale => _locale;
   bool get hasSelectedLanguage => _hasSelectedLanguage;
+  bool get hasCompletedOnboarding => _hasCompletedOnboarding;
   String? get errorMessage => _errorMessage;
 
   bool get isEn => _locale == 'en';
   bool get isMr => _locale == 'mr';
   bool get isHi => _locale == 'hi';
+  bool get isTe => _locale == 'te';
+  bool get isKn => _locale == 'kn';
+  bool get isGu => _locale == 'gu';
 
   Future<void> _init() async {
     _locale = StorageService.getLocale();
     _hasSelectedLanguage = StorageService.hasSelectedLanguage();
     _currentUser = StorageService.getProfile();
+    _hasCompletedOnboarding = StorageService.hasCompletedOnboarding() ||
+        (_currentUser?.hasCompletedOnboarding == true);
     notifyListeners();
 
     // If we have an existing authenticated user, refresh profile in background
@@ -165,6 +172,36 @@ class AuthViewModel extends ChangeNotifier {
     }
     _setLoading(false);
     return false;
+  }
+
+  // Complete initial Farmer Onboarding (name, acres, city, village, crops)
+  Future<void> completeOnboarding({
+    required String fullName,
+    required double landSizeAcres,
+    required String district,
+    required String village,
+    required List<String> crops,
+    double? latitude,
+    double? longitude,
+  }) async {
+    final base = _currentUser ?? UserProfile.defaultDemo();
+    _currentUser = base.copyWith(
+      fullName: fullName,
+      landSizeAcres: landSizeAcres,
+      district: district,
+      village: village,
+      preferredCrops: crops,
+      hasCompletedOnboarding: true,
+      latitude: latitude ?? base.latitude,
+      longitude: longitude ?? base.longitude,
+    );
+    _hasCompletedOnboarding = true;
+    await StorageService.saveProfile(_currentUser!);
+    await StorageService.setOnboardingDone(true);
+    if (!_currentUser!.isDemo) {
+      await _authService.upsertRemoteProfile(_currentUser!);
+    }
+    notifyListeners();
   }
 
   // Update profile details (name, phone, village, acreage, coordinates)

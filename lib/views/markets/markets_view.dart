@@ -30,7 +30,7 @@ class MarketsView extends StatelessWidget {
             ),
             Text(
               AppStrings.get('arbitrageSubtitle', locale: loc),
-              style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 10),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 10),
             ),
           ],
         ),

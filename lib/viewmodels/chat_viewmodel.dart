@@ -30,40 +30,76 @@ class ChatViewModel extends ChangeNotifier {
     if (_messages.isNotEmpty && _messages.first.id == 'greet_1') {
       _messages.removeAt(0);
     }
-    final isEn = locale == 'en';
-    final isHi = locale == 'hi';
+
+    String greetingText;
+    List<String> replies;
+
+    switch (locale) {
+      case 'te':
+        greetingText = 'నమస్కారం! నేను కిసాన్ మిత్ర వ్యవసాయ AI సహాయకుడిని. మార్కెట్ ధరలు, పంట తెగుళ్ళు, స్ప్రే సమయాలు లేదా ఎరువుల గురించి నన్ను అడగండి.';
+        replies = [
+          'ఈరోజు సోయాబీన్ మార్కెట్ రేటు',
+          'ఇప్పుడు మందు పిచికారీ చేయడానికి వాతావరణం సురక్షితమేనా?',
+          'తెగుళ్ల నివారణ మందులు',
+          'ఎకరాకు యూరియా మోతాదు',
+        ];
+        break;
+      case 'kn':
+        greetingText = 'ನಮಸ್ಕಾರ! ನಾನು ಕಿಸಾನ್ ಮಿತ್ರ ಕೃಷಿ AI ಸಹಾಯಕ. ನೀವು ಮಾರುಕಟ್ಟೆ ದರಗಳು, ಬೆಳೆ ರೋಗಗಳು, ಸಿಂಪಡಣೆ ಸಮಯ ಅಥವಾ ರಸಗೊಬ್ಬರಗಳ ಬಗ್ಗೆ ಕೇಳಬಹುದು.';
+        replies = [
+          'ಇಂದಿನ ಸೋಯಾಬೀನ್ ಮಾರುಕಟ್ಟೆ ದರ',
+          'ಈಗ ಸಿಂಪಡಿಸಲು ಹವಾಮಾನ ಸೂಕ್ತವೇ?',
+          'ಬೆಳೆ ರೋಗ ನಿಯಂತ್ರಣ',
+          'ಎಕರೆಗೆ ಯೂರಿಯಾ ಪ್ರಮಾಣ',
+        ];
+        break;
+      case 'gu':
+        greetingText = 'નમસ્તે! હું કિસાનમિત્ર કૃષિ AI સહાયક છું. તમે બજાર ભાવ, પાકના રોગ, છંટકાવનો સમય અથવા ખાતર વિશે પૂછી શકો છો.';
+        replies = [
+          'આજનો સોયાબીન બજાર ભાવ',
+          'શું અત્યારે છંટકાવ માટે હવામાન અનુકૂળ છે?',
+          'પાક રોગ નિયંત્રણ દવા',
+          'એકર દીઠ યુરિયા ખાતરની માત્રા',
+        ];
+        break;
+      case 'hi':
+        greetingText = 'नमस्ते! मैं किसानमित्र कृषि AI सहायक हूँ। आप मंडी भाव, फसल रोग, छिड़काव समय और खाद के बारे में पूछ सकते हैं।';
+        replies = [
+          'आज का सोयाबीन मंडी भाव',
+          'क्या अभी छिड़काव के लिए मौसम सुरक्षित है?',
+          'सोयाबीन रस्ट रोग का इलाज',
+          'खेत में यूरिया की मात्रा',
+        ];
+        break;
+      case 'mr':
+        greetingText = 'नमस्कार! मी किसानमित्र कृषी AI सहाय्यक आहे. आपण बाजारभाव, पीक रोग, फवारणीच्या वेळा किंवा खतांबद्दल मराठी, हिंदी अथवा इंग्रजीत विचारू शकता.';
+        replies = [
+          'आजचा सोयाबीन बाजारभाव',
+          'फवारणीसाठी हवामान अनुकूल आहे का?',
+          'सोयाबीनवरील तांबेरा औषध',
+          'मातीतील युरिया प्रमाण',
+        ];
+        break;
+      case 'en':
+      default:
+        greetingText = 'Hello! I am KisanMitra AI farming assistant. You can ask me about mandi prices, crop diseases, spray timings, or fertilizers in your preferred language.';
+        replies = [
+          "Today's Soybean Mandi Rate",
+          'Is weather safe for spraying now?',
+          'Soybean Rust treatment',
+          'Urea dosage per acre',
+        ];
+        break;
+    }
 
     _messages.insert(
       0,
       ChatMessage(
         id: 'greet_1',
-        text: isEn
-            ? 'Hello! I am KisanMitra AI farming assistant. You can ask me about mandi prices, crop diseases, spray timings, or fertilizers in your preferred language.'
-            : isHi
-                ? 'नमस्ते! मैं किसानमित्र कृषि AI सहायक हूँ। आप मंडी भाव, फसल रोग, छिड़काव समय और खाद के बारे में पूछ सकते हैं।'
-                : 'नमस्कार! मी किसानमित्र कृषी AI सहाय्यक आहे. आपण बाजारभाव, पीक रोग, फवारणीच्या वेळा किंवा खतांबद्दल मराठी, हिंदी अथवा इंग्रजीत विचारू शकता.',
+        text: greetingText,
         isUser: false,
         timestamp: DateTime.now(),
-        quickReplies: isEn
-            ? [
-                "Today's Soybean Mandi Rate",
-                'Is weather safe for spraying now?',
-                'Soybean Rust treatment',
-                'Urea dosage per acre',
-              ]
-            : isHi
-                ? [
-                    'आज का सोयाबीन मंडी भाव',
-                    'क्या अभी छिड़काव के लिए मौसम सुरक्षित है?',
-                    'सोयाबीन रस्ट रोग का इलाज',
-                    'खेत में यूरिया की मात्रा',
-                  ]
-                : [
-                    'आजचा सोयाबीन बाजारभाव',
-                    'फवारणीसाठी हवामान अनुकूल आहे का?',
-                    'सोयाबीनवरील तांबेरा औषध',
-                    'मातीतील युरिया प्रमाण',
-                  ],
+        quickReplies: replies,
       ),
     );
     notifyListeners();

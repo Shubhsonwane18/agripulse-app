@@ -131,7 +131,7 @@ class CropPriceForecast {
         potentialExtraProfit: 0.0,
         daysAhead: 7,
         confidencePercent: 91,
-        weeklyTrend: const [1850, 1720, 1600, 1500],
+        weeklyTrend: [1850, 1720, 1600, 1500],
       );
     }
 

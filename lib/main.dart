@@ -17,6 +17,7 @@ import 'viewmodels/khata_viewmodel.dart';
 import 'viewmodels/intercropping_viewmodel.dart';
 import 'views/main_nav_scaffold.dart';
 import 'views/auth/login_view.dart';
+import 'views/auth/farmer_onboarding_view.dart';
 import 'views/language/language_selection_view.dart';
 
 void main() async {
@@ -69,7 +70,11 @@ class AgriPulseApp extends StatelessWidget {
     if (!authVm.hasSelectedLanguage) {
       homeWidget = const LanguageSelectionView(isFirstTime: true);
     } else if (authVm.isAuthenticated) {
-      homeWidget = const MainNavScaffold();
+      if (!authVm.hasCompletedOnboarding) {
+        homeWidget = const FarmerOnboardingView();
+      } else {
+        homeWidget = const MainNavScaffold();
+      }
     } else {
       homeWidget = const LoginView();
     }

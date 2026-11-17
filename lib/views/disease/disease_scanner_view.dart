@@ -32,7 +32,7 @@ class DiseaseScannerView extends StatelessWidget {
             ),
             Text(
               AppStrings.get('diseaseSubtitle', locale: loc),
-              style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 10),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 10),
             ),
           ],
         ),
@@ -67,7 +67,15 @@ class DiseaseScannerView extends StatelessWidget {
                       const CircularProgressIndicator(color: AppColors.primary),
                       const SizedBox(height: 12),
                       Text(
-                        authVm.isEn ? 'AI leaf disease diagnosis in progress...' : 'AI पान रोग निदान सुरू आहे...',
+                        AppStrings.tr(
+                          loc,
+                          en: 'AI leaf disease diagnosis in progress...',
+                          mr: 'AI पान रोग निदान सुरू आहे...',
+                          hi: 'AI फसल रोग जांच जारी है...',
+                          te: 'AI ఆకు తెగులు విశ్లేషణ జరుగుతోంది...',
+                          kn: 'AI ಎಲೆ ರೋಗ ಪತ್ತೆ ಪ್ರಕ್ರಿಯೆ ಪ್ರಗತಿಯಲ್ಲಿದೆ...',
+                          gu: 'AI પાંદડાના રોગની તપાસ ચાલુ છે...',
+                        ),
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                     ],
@@ -76,7 +84,7 @@ class DiseaseScannerView extends StatelessWidget {
               ),
             ] else if (diseaseVm.diagnosisResult != null) ...[
               // 3. AI Diagnosis Result Card
-              _buildDiagnosisResultCard(context, diseaseVm, weatherVm, loc, authVm.isEn),
+              _buildDiagnosisResultCard(context, diseaseVm, weatherVm, loc),
             ],
           ],
         ),
@@ -96,7 +104,7 @@ class DiseaseScannerView extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primaryLight,
               shape: BoxShape.circle,
             ),
@@ -104,13 +112,29 @@ class DiseaseScannerView extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            loc == 'en' ? 'Take a clear photo of infected crop leaf' : 'रोगाची लागण झालेल्या पानाचा स्पष्ट फोटो काढा',
+            AppStrings.tr(
+              loc,
+              en: 'Take a clear photo of infected crop leaf',
+              mr: 'रोगाची लागण झालेल्या पानाचा स्पष्ट फोटो काढा',
+              hi: 'रोग प्रभावित पत्ते की स्पष्ट तस्वीर लें',
+              te: 'తెగులు సోకిన ఆకు యొక్క స్పష్టమైన ఫోటో తీయండి',
+              kn: 'ರೋಗ ಪೀಡಿತ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ತೆಗೆಯಿರಿ',
+              gu: 'રોગગ્રસ્ત પાંદડાનો સ્પષ્ટ ફોટો લો',
+            ),
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
           Text(
-            loc == 'en' ? 'Hold camera close to leaf with adequate sunlight.' : 'कॅमेरा थेट पानाच्या जवळ ठेवून सूर्यप्रकाशात फोटो घ्या.',
+            AppStrings.tr(
+              loc,
+              en: 'Hold camera close to leaf with adequate sunlight.',
+              mr: 'कॅमेरा थेट पानाच्या जवळ ठेवून सूर्यप्रकाशात फोटो घ्या.',
+              hi: 'कैमरा पत्ते के पास रखकर पर्याप्त रोशनी में फोटो लें।',
+              te: 'సూర్యరశ్మిలో కెమెరాను ఆకుకు దగ్గరగా ఉంచి ఫోటో తీయండి.',
+              kn: 'ಸಾಕಷ್ಟು ಬೆಳಕಿನಲ್ಲಿ ಕ್ಯಾಮೆರಾವನ್ನು ಎಲೆಯ ಹತ್ತಿರ ಇರಿಸಿ ಫೋಟೋ ತೆಗೆಯಿರಿ.',
+              gu: 'પૂરતા સૂર્યપ્રકાશમાં કેમેરા પાંદડા નજીક રાખી ફોટો લો.',
+            ),
             style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
             textAlign: TextAlign.center,
           ),
@@ -170,7 +194,7 @@ class DiseaseScannerView extends StatelessWidget {
             top: 10,
             right: 10,
             child: CircleAvatar(
-              backgroundColor: Colors.black.withOpacity(0.6),
+              backgroundColor: Colors.black.withValues(alpha: 0.6),
               child: IconButton(
                 icon: const Icon(Icons.close, color: Colors.white, size: 18),
                 onPressed: () => vm.clearScan(),
@@ -187,7 +211,6 @@ class DiseaseScannerView extends StatelessWidget {
     DiseaseViewModel diseaseVm,
     WeatherViewModel weatherVm,
     String loc,
-    bool isEn,
   ) {
     final res = diseaseVm.diagnosisResult!;
     final isWeatherSafe = weatherVm.isSafeToSpray;
@@ -220,7 +243,7 @@ class DiseaseScannerView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      '${(res.confidence * 100).toStringAsFixed(0)}% AI ${isEn ? "Accuracy" : "अचूकता"}',
+                      '${(res.confidence * 100).toStringAsFixed(0)}% AI ${AppStrings.tr(loc, en: "Accuracy", mr: "अचूकता", hi: "सटीकता", te: "ఖచ్చితత్వం", kn: "ನಿಖರತೆ", gu: "ચોકસાઈ")}',
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -256,8 +279,24 @@ class DiseaseScannerView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         isWeatherSafe
-                            ? (isEn ? 'Safe to Spray: Weather conditions are optimal for chemical application.' : 'हवामान अनुकूल: सध्या फवारणी करणे सुरक्षित आहे.')
-                            : (isEn ? 'Weather Risk: Rain or high wind drift hazard. Do not spray now.' : 'हवामान धोका: पाऊस किंवा वेगाने वाहणाऱ्या वाऱ्यामुळे आत्ता फवारणी करू नका.'),
+                            ? AppStrings.tr(
+                                loc,
+                                en: 'Safe to Spray: Weather conditions are optimal for chemical application.',
+                                mr: 'हवामान अनुकूल: सध्या फवारणी करणे सुरक्षित आहे.',
+                                hi: 'छिड़काव के लिए सुरक्षित: मौसम की स्थिति दवा छिड़काव के अनुकूल है।',
+                                te: 'స్ప్రే చేయడానికి అనుకూలం: వాతావరణ పరిస్థితులు బాగున్నాయి.',
+                                kn: 'ಸಿಂಪಡಿಸಲು ಸುರಕ್ಷಿತ: ಹವಾಮಾನ ಪರಿಸ್ಥಿತಿಗಳು ಸೂಕ್ತವಾಗಿವೆ.',
+                                gu: 'છંટકાવ માટે અનુકૂળ: હવામાન પરિસ્થિતિ શ્રેષ્ઠ છે.',
+                              )
+                            : AppStrings.tr(
+                                loc,
+                                en: 'Weather Risk: Rain or high wind drift hazard. Do not spray now.',
+                                mr: 'हवामान धोका: पाऊस किंवा वेगाने वाहणाऱ्या वाऱ्यामुळे आत्ता फवारणी करू नका.',
+                                hi: 'मौसम जोखिम: बारिश या तेज हवा का खतरा। अभी छिड़काव न करें।',
+                                te: 'వాతావరణ ప్రమాదం: వర్షం లేదా గాలి ప్రమాదం. ఇప్పుడు పిచికారీ చేయవద్దు.',
+                                kn: 'ಹವಾಮಾನ ಅಪಾಯ: ಮಳೆ ಅಥವಾ ಬಲವಾದ ಗಾಳಿಯ ಅಪಾಯ. ಈಗ ಸಿಂಪಡಿಸಬೇಡಿ.',
+                                gu: 'હવામાન જોખમ: વરસાદ અથવા ભારે પવનનું જોખમ. હમણાં છંટકાવ ન કરો.',
+                              ),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
@@ -296,16 +335,19 @@ class DiseaseScannerView extends StatelessWidget {
                   ),
                   if (rx.tradeNames != null)
                     Text(
-                      '${isEn ? "Trade Name" : "बाजार नाव (Trade)"}: ${rx.tradeNames}',
+                      '${AppStrings.tr(loc, en: "Trade Name", mr: "बाजार नाव (Trade)", hi: "व्यापारिक नाम", te: "మార్కెట్ పేరు", kn: "ವಾಣಿಜ್ಯ ಹೆಸರು", gu: "વેપારી નામ")}: ${rx.tradeNames}',
                       style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                     ),
                   const Divider(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildRxBadge(isEn ? 'Dosage' : 'प्रमाण', rx.dosagePerAcre),
-                      _buildRxBadge(isEn ? 'Water' : 'पाणी', rx.waterVolumeLiters),
-                      _buildRxBadge(isEn ? 'Waiting Period' : 'प्रतीक्षा काळ', '${rx.waitingPeriodDays} ${isEn ? "days" : "दिवस"}'),
+                      _buildRxBadge(AppStrings.tr(loc, en: 'Dosage', mr: 'प्रमाण', hi: 'मात्रा', te: 'మోతాదు', kn: 'ಪ್ರಮಾಣ', gu: 'માત્રા'), rx.dosagePerAcre),
+                      _buildRxBadge(AppStrings.tr(loc, en: 'Water', mr: 'पाणी', hi: 'पानी', te: 'నీరు', kn: 'ನೀರು', gu: 'પાણી'), rx.waterVolumeLiters),
+                      _buildRxBadge(
+                        AppStrings.tr(loc, en: 'Waiting Period', mr: 'प्रतीक्षा काळ', hi: 'प्रतीक्षा अवधि', te: 'వేచి ఉండే సమయం', kn: 'ಕಾಯುವ ಅವಧಿ', gu: 'પ્રતીક્ષા સમય'),
+                        '${rx.waitingPeriodDays} ${AppStrings.tr(loc, en: "days", mr: "दिवस", hi: "दिन", te: "రోజులు", kn: "ದಿನಗಳು", gu: "દિવસ")}',
+                      ),
                     ],
                   ),
                 ],

@@ -7,12 +7,23 @@ class StorageService {
   static const String _keyProfile = 'kisanmitra_user_profile';
   static const String _keyLocale = 'kisanmitra_locale';
   static const String _keyLanguageSelected = 'kisanmitra_lang_selected_flag';
+  static const String _keyOnboardingDone = 'kisanmitra_onboarding_done';
   static const String _keyKhata = 'kisanmitra_khata_entries';
 
   static SharedPreferences? _prefs;
 
   static Future<void> init() async {
     _prefs ??= await SharedPreferences.getInstance();
+  }
+
+  // Onboarding Done Flag
+  static Future<void> setOnboardingDone(bool val) async {
+    await init();
+    await _prefs!.setBool(_keyOnboardingDone, val);
+  }
+
+  static bool hasCompletedOnboarding() {
+    return _prefs?.getBool(_keyOnboardingDone) ?? false;
   }
 
   // Khata Entries Persistence

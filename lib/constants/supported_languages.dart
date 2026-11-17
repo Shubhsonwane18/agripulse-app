@@ -19,6 +19,14 @@
 class SupportedLanguages {
   static const List<AppLanguage> all = [
     AppLanguage(
+      code: 'en',
+      nativeName: 'English',
+      englishName: 'English',
+      region: 'All India (National)',
+      greeting: 'Welcome Farmer Friends',
+      icon: '🌐',
+    ),
+    AppLanguage(
       code: 'mr',
       nativeName: 'मराठी',
       englishName: 'Marathi',
@@ -97,14 +105,6 @@ class SupportedLanguages {
       region: 'കേരളം (Kerala)',
       greeting: 'നമസ്കാരം കർഷക സുഹൃത്തുക്കളെ',
       icon: '🌴',
-    ),
-    AppLanguage(
-      code: 'en',
-      nativeName: 'English',
-      englishName: 'English',
-      region: 'All India (National)',
-      greeting: 'Welcome Farmer Friends',
-      icon: '🇮🇳',
     ),
   ];
 

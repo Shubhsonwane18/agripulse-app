@@ -66,7 +66,7 @@ class _ChatViewState extends State<ChatView> {
             ),
             Text(
               AppStrings.get('chatSubtitle', locale: loc),
-              style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 10),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 10),
             ),
           ],
         ),
@@ -81,7 +81,7 @@ class _ChatViewState extends State<ChatView> {
               itemCount: chatVm.messages.length,
               itemBuilder: (context, idx) {
                 final msg = chatVm.messages[idx];
-                return _buildMessageBubble(context, msg, chatVm);
+                return _buildMessageBubble(context, msg, chatVm, loc);
               },
             ),
           ),
@@ -119,7 +119,7 @@ class _ChatViewState extends State<ChatView> {
     );
   }
 
-  Widget _buildMessageBubble(BuildContext context, ChatMessage msg, ChatViewModel chatVm) {
+  Widget _buildMessageBubble(BuildContext context, ChatMessage msg, ChatViewModel chatVm, String loc) {
     final isUser = msg.isUser;
 
     return Align(
@@ -168,7 +168,7 @@ class _ChatViewState extends State<ChatView> {
                       Icon(chatVm.isPlaying ? Icons.pause : Icons.volume_up, color: AppColors.primary, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        Provider.of<AuthViewModel>(context, listen: false).isEn ? 'Listen to Voice Note' : 'व्हॉईस नोट ऐका (Audio)',
+                        AppStrings.tr(loc, en: 'Listen to Voice Note', mr: 'व्हॉईस नोट ऐका (Audio)', hi: 'वॉयस नोट सुनें', te: 'వాయిస్ నోట్ వినండి', kn: 'ಧ್ವನಿ ಟಿಪ್ಪಣಿ ಆಲಿಸಿ', gu: 'વોઇસ નોટ સાંભળો'),
                         style: const TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.bold),
                       ),
                     ],

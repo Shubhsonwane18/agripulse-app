@@ -63,6 +63,24 @@ class AppStrings {
       'addToCart': 'Add to Cart',
       'checkout': 'Place Order / Request',
       'soilTitle': 'Soil NPK & Health Calculator',
+      'activeFarmer': '✓ Active Farmer',
+      'acresFarmland': 'Acres Farmland',
+      'nearbyMandisTitle': 'Nearby Mandis & Live Market Rates',
+      'nearbyMandisSub': 'Select city & crop ➔ View live rates ➔ Calculate transport & true profit',
+      'calcTransportBtn': 'Calculate Transport & True Profit',
+      'calcTransportSub': 'Enter quantity ➔ Auto-select vehicle ➔ Compare in-hand cash',
+      'localSoilTitle': 'Local Soil Type & Suitable Crops',
+      'myCropsForecastTitle': 'My Standing Crops & AI Price Forecast',
+      'standingCrop': 'Standing Crop:',
+      'storedStock': 'Stored Stock:',
+      'todayPrice': "Today's Price",
+      'projectedPrice': 'Projected Price',
+      'agriToolsTitle': 'Agricultural Decision Tools',
+      'govtSchemes': 'Govt Schemes DBT',
+      'farmKhata': 'Farm Khata Ledger',
+      'intercropping': 'Intercropping Planner',
+      'soilAdvisory': 'Soil Health & NPK',
+      'agriStore': 'Agri Input Store',
     },
     'mr': {
       'appName': 'अॅग्रीपल्स',
@@ -127,6 +145,24 @@ class AppStrings {
       'addToCart': 'खरेदी करा',
       'checkout': 'मागणी नोंदवा',
       'soilTitle': 'माती परीक्षण व खत मात्रा',
+      'activeFarmer': '✓ सक्रिय शेतकरी',
+      'acresFarmland': 'एकर शेतजमीन',
+      'nearbyMandisTitle': 'नजीकच्या बाजारपेठा व थेट बाजारभाव',
+      'nearbyMandisSub': 'शहर व पीक निवडा ➔ थेट दर पाहा ➔ वाहतूक खर्च व खरा नफा मोजा',
+      'calcTransportBtn': 'वाहतूक खर्च व निव्वळ नफा कॅल्क्युलेटर',
+      'calcTransportSub': 'वजन टाका ➔ वाहन आपोआप निवडले जाईल ➔ खरा नफा पाहा',
+      'localSoilTitle': 'स्थानिक माती प्रकार व योग्य पिके',
+      'myCropsForecastTitle': 'माझी पिके व AI बाजारभाव अंदाज',
+      'standingCrop': 'सध्याचे पीक:',
+      'storedStock': 'शिल्लक साठा (Stock):',
+      'todayPrice': 'आजचा भाव',
+      'projectedPrice': 'भाकीत भाव',
+      'agriToolsTitle': 'शेती निर्णय साधने',
+      'govtSchemes': 'शासकीय योजना व थेट अनुदान',
+      'farmKhata': 'शेतकरी नफा-तोटा वही',
+      'intercropping': 'आंतरपीक व फेरपालट मार्गदर्शक',
+      'soilAdvisory': 'माती परीक्षण सल्ला',
+      'agriStore': 'कृषी इनपुट स्टोअर',
     },
     'hi': {
       'appName': 'एग्रीपल्स',
@@ -191,6 +227,24 @@ class AppStrings {
       'addToCart': 'कार्ट में डालें',
       'checkout': 'ऑर्डर भेजें',
       'soilTitle': 'मृदा परीक्षण एवं खाद मात्रा',
+      'activeFarmer': '✓ सक्रिय किसान',
+      'acresFarmland': 'एकड़ कृषि भूमि',
+      'nearbyMandisTitle': 'नजदीकी मंडियां एवं ताजा बाजार भाव',
+      'nearbyMandisSub': 'शहर व फसल चुनें ➔ लाइव भाव देखें ➔ परिवहन खर्च व शुद्ध लाभ निकालें',
+      'calcTransportBtn': 'परिवहन खर्च एवं शुद्ध लाभ कैलकुलेटर',
+      'calcTransportSub': 'मात्रा दर्ज करें ➔ वाहन स्वतः चुना जाएगा ➔ शुद्ध रकम देखें',
+      'localSoilTitle': 'स्थानीय मिट्टी का प्रकार एवं उपयुक्त फसलें',
+      'myCropsForecastTitle': 'मेरी फसलें एवं AI बाजार भाव अनुमान',
+      'standingCrop': 'खेत में खड़ी फसल:',
+      'storedStock': 'गोदाम में बचा माल:',
+      'todayPrice': 'आज का भाव',
+      'projectedPrice': 'अनुमानित भाव',
+      'agriToolsTitle': 'कृषि निर्णय उपकरण',
+      'govtSchemes': 'सरकारी योजनाएं एवं सब्सिडी (DBT)',
+      'farmKhata': 'किसान बही-खाता (Farm Khata)',
+      'intercropping': 'अंतरफसल एवं फसल चक्र मार्गदर्शक',
+      'soilAdvisory': 'मृदा स्वास्थ्य एवं NPK सलाह',
+      'agriStore': 'कृषि इनपुट केंद्र',
     },
     'te': {
       'appName': 'అగ్రిపల్స్',
@@ -255,6 +309,24 @@ class AppStrings {
       'addToCart': 'కార్ట్‌కు జోడించు',
       'checkout': 'ఆర్డర్ చేయండి',
       'soilTitle': 'నేల పరీక్ష & ఎరువుల మోతాదు',
+      'activeFarmer': '✓ క్రియాశీల రైతు',
+      'acresFarmland': 'ఎకరాల వ్యవసాయ భూమి',
+      'nearbyMandisTitle': 'సమీప మార్కెట్లు & ప్రత్యక్ష మార్కెట్ ధరలు',
+      'nearbyMandisSub': 'నగరం & పంట ఎంచుకోండి ➔ ధరలు చూడండి ➔ రవాణా ఖర్చు & నికర లాభం లెక్కించండి',
+      'calcTransportBtn': 'రవాణా ఖర్చు & నికర లాభ లెక్కింపు',
+      'calcTransportSub': 'పరిమాణం ఇవ్వండి ➔ వాహనం ఎంపిక ➔ నికర నగదు పోల్చండి',
+      'localSoilTitle': 'స్థానిక నేల రకం & అనుకూలమైన పంటలు',
+      'myCropsForecastTitle': 'నా పంటలు & AI ధర అంచనా',
+      'standingCrop': 'ప్రస్తుత పంట:',
+      'storedStock': 'నిల్వ ఉన్న సరుకు:',
+      'todayPrice': 'నేటి ధర',
+      'projectedPrice': 'అంచనా ధర',
+      'agriToolsTitle': 'వ్యవసాయ నిర్ణయ సాధనాలు',
+      'govtSchemes': 'ప్రభుత్వ పథకాలు & రాయితీలు (DBT)',
+      'farmKhata': 'రైతు ఖాటా & ఖర్చుల పుస్తకం',
+      'intercropping': 'అంతర పంటల ప్రణాళిక',
+      'soilAdvisory': 'నేల ఆరోగ్యం & ఎరువుల మోతాదు',
+      'agriStore': 'రైతు ఎరువుల దుకాణం',
     },
     'kn': {
       'appName': 'ಅಗ್ರಿಪಲ್ಸ್',
@@ -319,6 +391,24 @@ class AppStrings {
       'addToCart': 'ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಿ',
       'checkout': 'ಆರ್ಡರ್ ನೀಡಿ',
       'soilTitle': 'ಮಣ್ಣು ಪರೀಕ್ಷೆ ಮತ್ತು ಗೊಬ್ಬರ ಪ್ರಮಾಣ',
+      'activeFarmer': '✓ ಸಕ್ರಿಯ ರೈತ',
+      'acresFarmland': 'ಎಕರೆ ಕೃಷಿ ಭೂಮಿ',
+      'nearbyMandisTitle': 'ಹತ್ತಿರದ ಮಾರುಕಟ್ಟೆಗಳು ಮತ್ತು ನೇರ ಮಾರುಕಟ್ಟೆ ದರಗಳು',
+      'nearbyMandisSub': 'ನಗರ ಮತ್ತು ಬೆಳೆ ಆಯ್ಕೆಮಾಡಿ ➔ ದರ ನೋಡಿ ➔ ಸಾರಿಗೆ ವೆಚ್ಚ ಮತ್ತು ನೈಜ ಲಾಭ ಲೆಕ್ಕಿಸಿ',
+      'calcTransportBtn': 'ಸಾರಿಗೆ ವೆಚ್ಚ ಮತ್ತು ನಿವ್ವಳ ಲಾಭ ಲೆಕ್ಕಾಚಾರ',
+      'calcTransportSub': 'ತೂಕ ನಮೂದಿಸಿ ➔ ವಾಹನ ಸ್ವಯಂ ಆಯ್ಕೆ ➔ ಕೈಗೆ ಸಿಗುವ ಲಾಭ ನೋಡಿ',
+      'localSoilTitle': 'ಸ್ಥಳೀಯ ಮಣ್ಣಿನ ಪ್ರಕಾರ ಮತ್ತು ಸೂಕ್ತ ಬೆಳೆಗಳು',
+      'myCropsForecastTitle': 'ನನ್ನ ಬೆಳೆಗಳು ಮತ್ತು AI ಬೆಲೆ ಮುನ್ಸೂಚನೆ',
+      'standingCrop': 'ಪ್ರಸ್ತುತ ಬೆಳೆ:',
+      'storedStock': 'ದಾಸ್ತಾನು ಇರುವ ಬೆಳೆ:',
+      'todayPrice': 'ಇಂದಿನ ದರ',
+      'projectedPrice': 'ಮುನ್ಸೂಚಿತ ದರ',
+      'agriToolsTitle': 'ಕೃಷಿ ನಿರ್ಧಾರ ಉಪಕರಣಗಳು',
+      'govtSchemes': 'ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು ಮತ್ತು ಸಹಾಯಧನ',
+      'farmKhata': 'ರೈತ ಖಾತೆ ಮತ್ತು ವೆಚ್ಚದ ಪುಸ್ತಕ',
+      'intercropping': 'ಮಿಶ್ರ ಬೆಳೆ ಮತ್ತು ಬೆಳೆ ಪರಿವರ್ತನೆ',
+      'soilAdvisory': 'ಮಣ್ಣು ಪರೀಕ್ಷೆ ಮತ್ತು ರಸಗೊಬ್ಬರ',
+      'agriStore': 'ರೈತ ಕೃಷಿ ಪರಿಕರಗಳ ಅಂಗಡಿ',
     },
     'ta': {
       'appName': 'அக்ரிபல்ஸ்',
@@ -447,6 +537,24 @@ class AppStrings {
       'addToCart': 'કાર્ટમાં ઉમેરો',
       'checkout': 'ઓર્ડર કરો',
       'soilTitle': 'માટી પરીક્ષણ અને ખાતર માત્રા',
+      'activeFarmer': '✓ સક્રિય ખેડૂત',
+      'acresFarmland': 'એકર ખેતીની જમીન',
+      'nearbyMandisTitle': 'નજીકની બજારો અને લાઈવ બજાર ભાવ',
+      'nearbyMandisSub': 'શહેર અને પાક પસંદ કરો ➔ લાઈવ ભાવ જુઓ ➔ પરિવહન ખર્ચ અને નફો ગણો',
+      'calcTransportBtn': 'પરિવહન ખર્ચ અને બજાર ચોખ્ખો નફો કેલ્ક્યુલેટર',
+      'calcTransportSub': 'વજન લખો ➔ વાહન આપમેળે પસંદ થશે ➔ ચોખ્ખી રકમ સરખાવો',
+      'localSoilTitle': 'સ્થાનિક માટીનો પ્રકાર અને યોગ્ય પાક',
+      'myCropsForecastTitle': 'મારા પાક અને AI બજાર ભાવ અનુમાન',
+      'standingCrop': 'ઊભો પાક:',
+      'storedStock': 'સંગ્રહિત માલ:',
+      'todayPrice': 'આજનો ભાવ',
+      'projectedPrice': 'અનુમાનિત ભાવ',
+      'agriToolsTitle': 'ખેતી નિર્ણય સાધનો',
+      'govtSchemes': 'સરકારી યોજનાઓ અને સબસિડી',
+      'farmKhata': 'ખેડૂત ખાતાવહી (નફો-નુકસાન)',
+      'intercropping': 'આંતરપાક અને પાક ફેરબદલી',
+      'soilAdvisory': 'માટી પરીક્ષણ અને ખાતર માત્રા',
+      'agriStore': 'ખેડૂત કૃષિ ઇનપુટ સ્ટોર',
     },
     'pa': {
       'appName': 'ਐਗਰੀਪਲਸ',
@@ -712,5 +820,34 @@ class AppStrings {
         _localizedValues['en']?[key] ??
         _localizedValues['mr']?[key] ??
         key;
+  }
+
+  static String tr(
+    String locale, {
+    required String en,
+    String? mr,
+    String? hi,
+    String? te,
+    String? kn,
+    String? gu,
+    String? ta,
+  }) {
+    switch (locale) {
+      case 'mr':
+        return mr ?? en;
+      case 'hi':
+        return hi ?? en;
+      case 'te':
+        return te ?? en;
+      case 'kn':
+        return kn ?? en;
+      case 'gu':
+        return gu ?? (hi ?? en);
+      case 'ta':
+        return ta ?? en;
+      case 'en':
+      default:
+        return en;
+    }
   }
 }
