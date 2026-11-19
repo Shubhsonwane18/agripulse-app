@@ -78,8 +78,11 @@ class _ChatViewState extends State<ChatView> {
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.all(16),
-              itemCount: chatVm.messages.length,
+              itemCount: chatVm.messages.length + (chatVm.isSending ? 1 : 0),
               itemBuilder: (context, idx) {
+                if (idx == chatVm.messages.length) {
+                  return _buildTypingIndicator(loc);
+                }
                 final msg = chatVm.messages[idx];
                 return _buildMessageBubble(context, msg, chatVm, loc);
               },
@@ -176,6 +179,44 @@ class _ChatViewState extends State<ChatView> {
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTypingIndicator(String loc) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.cardBorder),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              AppStrings.tr(
+                loc,
+                en: 'KisanMitra AI is analyzing...',
+                mr: 'किसानमित्र AI माहिती शोधत आहे...',
+                hi: 'किसानमित्र AI विश्लेषण कर रहा है...',
+                te: 'కిసాన్ మిత్ర AI విశ్లేషిస్తోంది...',
+                kn: 'ಕಿಸಾನ್ ಮಿತ್ರ AI ವಿಶ್ಲೇಷಿಸುತ್ತಿದೆ...',
+                gu: 'કિસાનમિત્ર AI વિશ્લેષણ કરી રહ્યું છે...',
+              ),
+              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontStyle: FontStyle.italic),
+            ),
           ],
         ),
       ),

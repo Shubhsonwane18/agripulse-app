@@ -9,6 +9,7 @@ import '../models/disease_model.dart';
 import '../models/village_model.dart';
 import '../models/store_model.dart';
 import '../models/chat_model.dart';
+import 'kisan_ai_chatbot_service.dart';
 
 class ApiService {
   final String _baseUrl;
@@ -174,6 +175,7 @@ class ApiService {
     required String locale,
     List<Map<String, String>> history = const [],
   }) async {
+    // 1. Try remote server first (3.5s timeout so user never waits if server is offline)
     try {
       final url = Uri.parse('$_baseUrl${ApiConstants.endpointChat}');
       final payload = {
@@ -186,35 +188,30 @@ class ApiService {
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),
-      ).timeout(const Duration(seconds: 25));
+      ).timeout(const Duration(milliseconds: 3500));
 
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
-        return ChatMessage(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          text: data['reply'] ?? data['response'] ?? data['message'] ?? '',
-          isUser: false,
-          timestamp: DateTime.now(),
-          audioUrl: data['audio_url'] ?? data['audioUrl'],
-          quickReplies: (data['quick_replies'] as List?)?.map((e) => e.toString()).toList(),
-        );
+        final replyText = data['reply'] ?? data['response'] ?? data['message'];
+        if (replyText != null && replyText.toString().trim().isNotEmpty) {
+          return ChatMessage(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            text: replyText.toString(),
+            isUser: false,
+            timestamp: DateTime.now(),
+            audioUrl: data['audio_url'] ?? data['audioUrl'],
+            quickReplies: (data['quick_replies'] as List?)?.map((e) => e.toString()).toList(),
+          );
+        }
       }
     } catch (e) {
-      print('[ApiService] sendChatMessage error: $e');
+      print('[ApiService] sendChatMessage remote fallback: $e');
     }
 
-    // Friendly fallback response if offline
-    final isMr = locale == 'mr';
-    final isHi = locale == 'hi';
-    return ChatMessage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      text: isMr
-          ? 'माफ करा, सर्व्हरशी संपर्क होत नाही. कृपया थोड्या वेळाने प्रयत्न करा किंवा थेट बाजारभाव व हवामान तपासा.'
-          : isHi
-              ? 'क्षमा करें, सर्वर से संपर्क नहीं हो पा रहा है। कृपया पुनः प्रयास करें।'
-              : 'I am having trouble connecting to the agronomy server. Please check your internet connection.',
-      isUser: false,
-      timestamp: DateTime.now(),
+    // 2. High-intelligence on-device agronomy engine fallback: guaranteed instant response
+    return KisanAiChatbotService.getResponse(
+      query: message,
+      locale: locale,
     );
   }
 

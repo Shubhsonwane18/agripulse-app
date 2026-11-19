@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../models/chat_model.dart';
 import '../services/api_service.dart';
+import '../services/kisan_ai_chatbot_service.dart';
 
 class ChatViewModel extends ChangeNotifier {
   final ApiService _apiService;
@@ -135,11 +136,9 @@ class ChatViewModel extends ChangeNotifier {
       _messages.add(reply);
     } catch (e) {
       _messages.add(
-        ChatMessage(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          text: 'माफ करा, उत्तर मिळवण्यात अडचण आली. कृपया पुन्हा प्रयत्न करा.',
-          isUser: false,
-          timestamp: DateTime.now(),
+        KisanAiChatbotService.getResponse(
+          query: trimmed,
+          locale: locale,
         ),
       );
     } finally {
